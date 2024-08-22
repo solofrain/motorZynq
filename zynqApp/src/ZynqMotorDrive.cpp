@@ -1,6 +1,6 @@
 /*
-FILENAME... DRCDriver.cpp
-USAGE...    Motor driver support for the DRC (Direct Register Control) controller implemented in Zynq.
+FILENAME... zynqDriver.cpp
+USAGE...    Motor driver support for the zynq (Direct Register Control) controller implemented in Zynq.
 
 Ji Li
 08/14/2024
@@ -19,37 +19,48 @@ Ji Li
 #include <asynOctetSyncIO.h>
 
 #include <epicsExport.h>
-#include "DRCDriver.h"
+#include "ZynqMotorDriver.h"
+#include "axi_reg.h"
 
 #define NINT(f) (int)((f)>0 ? (f)+0.5 : (f)-0.5)
 
-/** Creates a new DRCController object.
+/** Creates a new zynqController object.
   * \param[in] portName          The name of the asyn port that will be created for this driver
-  * \param[in] DRCPortName       The name of the drvAsynSerialPort that was created previously
-                                 to connect to the DRC controller 
+  * \param[in] zynqPortName       The name of the drvAsynSerialPort that was created previously
+                                 to connect to the zynq controller 
   * \param[in] numAxes           The number of axes that this controller supports 
   * \param[in] movingPollPeriod  The time between polls when any axis is moving 
   * \param[in] idlePollPeriod    The time between polls when no axis is moving 
   */
-DRCController::DRCController( const char *portName,
-                              const char *DRCPortName,
+zynqController::zynqController( const char *portName,
+                              const char *zynqPortName,
                               int numAxes, 
                               double movingPollPeriod,
                               double idlePollPeriod )
-  :  asynMotorController( portName, numAxes, NUM_DRC_PARAMS, 
+  :  asynMotorController( portName, numAxes, NUM_zynq_PARAMS, 
                           0, // No additional interfaces beyond those in base class
                           0, // No additional callback interfaces beyond those in base class
                           ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
                           1, // autoconnect
                           0, 0)  // Default priority and stack size
 {
+    std::cout << __func__ << ": creating zynqController object..." << std:: endl;
+    try
+    {
+        reg_p = std::make_unique<axi_reg>(reg_base_addr);
+    }
+    catch (const std::exception &e)
+    {
+        throw std::runtime_error("Unable to create axi_reg object in zynqController constructor. Try root.");
+    }
+
     int axis;
     asynStatus status;
-    DRCAxis *pAxis;
-    static const char *functionName = "DRCController::DRCController";
+    zynqAxis *pAxis;
+    static const char *functionName = "zynqController::zynqController";
   
-    /* Connect to DRC controller */
-    status = pasynOctetSyncIO->connect(DRCPortName, 0, &pasynUserController_, NULL);
+    /* Connect to zynq controller */
+    status = pasynOctetSyncIO->connect(zynqPortName, 0, &pasynUserController_, NULL);
     if (status)
     {
         asynPrint( this->pasynUserSelf, ASYN_TRACE_ERROR, 
@@ -59,31 +70,35 @@ DRCController::DRCController( const char *portName,
     
     for (axis=0; axis<numAxes; axis++)
     {
-        pAxis = new DRCAxis(this, axis);
+        pAxis = new zynqAxis(this, axis);
     }
   
     startPoller(movingPollPeriod, idlePollPeriod, 2);
 }
 
+zynqController::~zynqController()
+{
+    std::cout << __func__ << ": zynqController object destructed." << std::endl;
+}
 
-/** Creates a new DRCController object.
+/** Creates a new zynqController object.
   * Configuration command, called directly or from iocsh
   * \param[in] portName          The name of the asyn port that will be created for this driver
-  * \param[in] DRCPortName       The name of the drvAsynIPPPort that was created previouslyi
-                                 to connect to the DRC controller 
+  * \param[in] zynqPortName       The name of the drvAsynIPPPort that was created previouslyi
+                                 to connect to the zynq controller 
   * \param[in] numAxes           The number of axes that this controller supports 
   * \param[in] movingPollPeriod  The time in ms between polls when any axis is moving
   * \param[in] idlePollPeriod    The time in ms between polls when no axis is moving 
   */
-extern "C" int DRCCreateController(const char *portName, const char *DRCPortName, int numAxes, 
-                                   int movingPollPeriod, int idlePollPeriod)
-{
-    DRCController *pDRCController
-        = new DRCController(portName, DRCPortName, numAxes, movingPollPeriod/1000., idlePollPeriod/1000.);
-    
-    pDRCController = NULL;
-    return(asynSuccess);
-}
+//extern "C" int zynqCreateController(const char *portName, const char *zynqPortName, int numAxes, 
+//                                   int movingPollPeriod, int idlePollPeriod)
+//{
+//    zynqController *pzynqController
+//        = new zynqController(portName, zynqPortName, numAxes, movingPollPeriod/1000., idlePollPeriod/1000.);
+//    
+//    pzynqController = NULL;
+//    return(asynSuccess);
+//}
 
 /** Reports on status of the driver
   * \param[in] fp The file pointer on which report information will be written
@@ -92,10 +107,10 @@ extern "C" int DRCCreateController(const char *portName, const char *DRCPortName
   * If details > 0 then information is printed about each axis.
   * After printing controller-specific information it calls asynMotorController::report()
   */
-void DRCController::report(FILE *fp, int level)
+void zynqController::report(FILE *fp, int level)
 {
     fprintf( fp,
-             "MCB-4B motor driver %s, numAxes=%d, moving poll period=%f, idle poll period=%f\n", 
+             "Zynq motor driver %s, numAxes=%d, moving poll period=%f, idle poll period=%f\n", 
              this->portName,
              numAxes_,
              movingPollPeriod_,
@@ -105,32 +120,32 @@ void DRCController::report(FILE *fp, int level)
     asynMotorController::report(fp, level);
 }
 
-/** Returns a pointer to an DRCAxis object.
+/** Returns a pointer to an zynqAxis object.
   * Returns NULL if the axis number encoded in pasynUser is invalid.
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
-DRCAxis* DRCController::getAxis(asynUser *pasynUser)
+zynqAxis* zynqController::getAxis(asynUser *pasynUser)
 {
-    return static_cast<DRCAxis*>(asynMotorController::getAxis(pasynUser));
+    return static_cast<zynqAxis*>(asynMotorController::getAxis(pasynUser));
 }
 
-/** Returns a pointer to an DRCAxis object.
+/** Returns a pointer to an zynqAxis object.
   * Returns NULL if the axis number encoded in pasynUser is invalid.
   * \param[in] axisNo Axis index number. */
-DRCAxis* DRCController::getAxis(int axisNo)
+zynqAxis* zynqController::getAxis(int axisNo)
 {
-    return static_cast<DRCAxis*>(asynMotorController::getAxis(axisNo));
+    return static_cast<zynqAxis*>(asynMotorController::getAxis(axisNo));
 }
 
 
-// These are the DRCAxis methods
+// These are the zynqAxis methods
 
-/** Creates a new DRCAxis object.
-  * \param[in] pC Pointer to the DRCController to which this axis belongs. 
+/** Creates a new zynqAxis object.
+  * \param[in] pC Pointer to the zynqController to which this axis belongs. 
   * \param[in] axisNo Index number of this axis, range 0 to pC->numAxes_-1.
   * 
   * Initializes register numbers, etc.
   */
-DRCAxis::DRCAxis(DRCController *pC, int axisNo)
+zynqAxis::zynqAxis(zynqController *pC, int axisNo)
     : asynMotorAxis(pC, axisNo),
       pC_(pC)
 {  
@@ -142,7 +157,7 @@ DRCAxis::DRCAxis(DRCController *pC, int axisNo)
   *
   * After printing device-specific information calls asynMotorAxis::report()
   */
-void DRCAxis::report(FILE *fp, int level)
+void zynqAxis::report(FILE *fp, int level)
 {
     if (level > 0)
     {
@@ -155,11 +170,11 @@ void DRCAxis::report(FILE *fp, int level)
     asynMotorAxis::report(fp, level);
 }
 
-asynStatus DRCAxis::sendAccelAndVelocity( double acceleration, double velocity ) 
+asynStatus zynqAxis::sendAccelAndVelocity( double acceleration, double velocity ) 
 {
     asynStatus status;
     int ival;
-    // static const char *functionName = "DRC::sendAccelAndVelocity";
+    // static const char *functionName = "zynq::sendAccelAndVelocity";
   
     // Send the velocity
     ival = NINT( fabs(115200./velocity) );
@@ -182,14 +197,14 @@ asynStatus DRCAxis::sendAccelAndVelocity( double acceleration, double velocity )
 }
 
 
-asynStatus DRCAxis::move( double position,
+asynStatus zynqAxis::move( double position,
                           int relative,
                           double minVelocity,
                           double maxVelocity,
                           double acceleration )
 {
     asynStatus status;
-    // static const char *functionName = "DRCAxis::move";
+    // static const char *functionName = "zynqAxis::move";
   
     status = sendAccelAndVelocity(acceleration, maxVelocity);
     
@@ -205,10 +220,10 @@ asynStatus DRCAxis::move( double position,
     return status;
 }
 
-asynStatus DRCAxis::home(double minVelocity, double maxVelocity, double acceleration, int forwards)
+asynStatus zynqAxis::home(double minVelocity, double maxVelocity, double acceleration, int forwards)
 {
     asynStatus status;
-    // static const char *functionName = "DRCAxis::home";
+    // static const char *functionName = "zynqAxis::home";
   
     status = sendAccelAndVelocity(acceleration, maxVelocity);
   
@@ -224,10 +239,10 @@ asynStatus DRCAxis::home(double minVelocity, double maxVelocity, double accelera
     return status;
 }
 
-asynStatus DRCAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
+asynStatus zynqAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
 {
   asynStatus status;
-  static const char *functionName = "DRCAxis::moveVelocity";
+  static const char *functionName = "zynqAxis::moveVelocity";
 
   asynPrint(pasynUser_, ASYN_TRACE_FLOW,
     "%s: minVelocity=%f, maxVelocity=%f, acceleration=%f\n",
@@ -237,40 +252,40 @@ asynStatus DRCAxis::moveVelocity(double minVelocity, double maxVelocity, double 
 
   /* MCB-4B does not have jog command. Move 1 million steps */
   if (maxVelocity > 0.) {
-    /* This is a positive move in DRC coordinates */
+    /* This is a positive move in zynq coordinates */
     sprintf(pC_->outString_, "#%02dI+1000000", axisNo_);
   } else {
-      /* This is a negative move in DRC coordinates */
+      /* This is a negative move in zynq coordinates */
       sprintf(pC_->outString_, "#%02dI-1000000", axisNo_);
   }
   status = pC_->writeReadController();
   return status;
 }
 
-asynStatus DRCAxis::stop(double acceleration )
+asynStatus zynqAxis::stop(double acceleration )
 {
   asynStatus status;
-  //static const char *functionName = "DRCAxis::stop";
+  //static const char *functionName = "zynqAxis::stop";
 
   sprintf(pC_->outString_, "#%02dQ", axisNo_);
   status = pC_->writeReadController();
   return status;
 }
 
-asynStatus DRCAxis::setPosition(double position)
+asynStatus zynqAxis::setPosition(double position)
 {
   asynStatus status;
-  //static const char *functionName = "DRCAxis::setPosition";
+  //static const char *functionName = "zynqAxis::setPosition";
 
   sprintf(pC_->outString_, "#%02dP=%+d", axisNo_, NINT(position));
   status = pC_->writeReadController();
   return status;
 }
 
-asynStatus DRCAxis::setClosedLoop(bool closedLoop)
+asynStatus zynqAxis::setClosedLoop(bool closedLoop)
 {
   asynStatus status;
-  //static const char *functionName = "DRCAxis::setClosedLoop";
+  //static const char *functionName = "zynqAxis::setClosedLoop";
 
   sprintf(pC_->outString_, "#%02dW=%d", axisNo_, closedLoop ? 1:0);
   status = pC_->writeReadController();
@@ -283,7 +298,7 @@ asynStatus DRCAxis::setClosedLoop(bool closedLoop)
   * It calls setIntegerParam() and setDoubleParam() for each item that it polls,
   * and then calls callParamCallbacks() at the end.
   * \param[out] moving A flag that is set indicating that the axis is moving (true) or done (false). */
-asynStatus DRCAxis::poll(bool *moving)
+asynStatus zynqAxis::poll(bool *moving)
 { 
   int done;
   int driveOn;
@@ -335,27 +350,27 @@ asynStatus DRCAxis::poll(bool *moving)
 }
 
 /** Code for iocsh registration */
-static const iocshArg DRCCreateControllerArg0 = {"Port name", iocshArgString};
-static const iocshArg DRCCreateControllerArg1 = {"MCB-4B port name", iocshArgString};
-static const iocshArg DRCCreateControllerArg2 = {"Number of axes", iocshArgInt};
-static const iocshArg DRCCreateControllerArg3 = {"Moving poll period (ms)", iocshArgInt};
-static const iocshArg DRCCreateControllerArg4 = {"Idle poll period (ms)", iocshArgInt};
-static const iocshArg * const DRCCreateControllerArgs[] = {&DRCCreateControllerArg0,
-                                                             &DRCCreateControllerArg1,
-                                                             &DRCCreateControllerArg2,
-                                                             &DRCCreateControllerArg3,
-                                                             &DRCCreateControllerArg4};
-static const iocshFuncDef DRCCreateControllerDef = {"DRCCreateController", 5, DRCCreateControllerArgs};
-static void DRCCreateContollerCallFunc(const iocshArgBuf *args)
+static const iocshArg zynqCreateControllerArg0 = {"Port name", iocshArgString};
+static const iocshArg zynqCreateControllerArg1 = {"MCB-4B port name", iocshArgString};
+static const iocshArg zynqCreateControllerArg2 = {"Number of axes", iocshArgInt};
+static const iocshArg zynqCreateControllerArg3 = {"Moving poll period (ms)", iocshArgInt};
+static const iocshArg zynqCreateControllerArg4 = {"Idle poll period (ms)", iocshArgInt};
+static const iocshArg * const zynqCreateControllerArgs[] = {&zynqCreateControllerArg0,
+                                                             &zynqCreateControllerArg1,
+                                                             &zynqCreateControllerArg2,
+                                                             &zynqCreateControllerArg3,
+                                                             &zynqCreateControllerArg4};
+static const iocshFuncDef zynqCreateControllerDef = {"zynqCreateController", 5, zynqCreateControllerArgs};
+static void zynqCreateContollerCallFunc(const iocshArgBuf *args)
 {
-  DRCCreateController(args[0].sval, args[1].sval, args[2].ival, args[3].ival, args[4].ival);
+  zynqCreateController(args[0].sval, args[1].sval, args[2].ival, args[3].ival, args[4].ival);
 }
 
-static void DRCRegister(void)
+static void zynqRegister(void)
 {
-  iocshRegister(&DRCCreateControllerDef, DRCCreateContollerCallFunc);
+  iocshRegister(&zynqCreateControllerDef, zynqCreateContollerCallFunc);
 }
 
 extern "C" {
-epicsExportRegistrar(DRCRegister);
+epicsExportRegistrar(zynqRegister);
 }
