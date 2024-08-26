@@ -1,0 +1,6 @@
+EPICS_BASE=/epics/base/base-7.0.8.1
+SUPPORT=/epics/base/base-7.0.8.1/synApps_6_3/support
+MOTOR=/epics/base/base-7.0.8.1/synApps_6_3/support/motor-R7-3-1
+-include $(MOTOR)/modules/RELEASE.$(EPICS_HOST_ARCH).local
+# path to motorAcs is needed to build the IOC inside motorAcs, but outside motor
+MOTOR_ZYNQ=/epics/base/base-7.0.8.1/synApps_6_3/support/motor-R7-3-1/modules/motorZynq

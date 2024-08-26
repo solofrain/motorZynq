@@ -1,42 +1,32 @@
-TOP=../..
-
+# Makefile
+TOP = ../..
 include $(TOP)/configure/CONFIG
-#----------------------------------------
-#  ADD MACRO DEFINITIONS AFTER THIS LINE
-#=============================
+
+# The following are used for debugging messages.
+USR_CXXFLAGS += -DDEBUG
 
 #=============================
-# Build the IOC application
+# build a support library
+#LIBRARY_IOC = zynqMotor
+PROD_IOC = zynqMotor
 
-PROD_IOC = zynq
-# zynq.dbd will be created and installed
+#DBD += zynqMotorSupport.dbd
+#zynqMotorSupport_DBD += zynqMotor.dbd
+
 DBD += zynq.dbd
-
-# zynq.dbd will be made up from these files:
 zynq_DBD += base.dbd
+zynq_DBD += asyn.dbd
+zynq_DBD += motorSupport.dbd
+zynq_DBD += zynqMotorSupport.dbd
 
-# Include dbd files from all support applications:
-#zynq_DBD += xxx.dbd
+#SRCS += ZynqMotorRegister.cc
 
-# Add all the support libraries needed by this IOC
-#zynq_LIBS += xxx
+# Advanced Control Systems driver support.
+#SRCS += devZynqMotor.c drvMCB4B.c
+zynqMotor_SRCS += zynqMotorDriver.cpp axi_reg.cc spinlock.cc
 
-# zynq_registerRecordDeviceDriver.cpp derives from zynq.dbd
-zynq_SRCS += zynq_registerRecordDeviceDriver.cpp
-
-# Build the main IOC entry point on workstation OSs.
-zynq_SRCS_DEFAULT += zynqMain.cpp
-zynq_SRCS_vxWorks += -nil-
-
-# Add support from base/src/vxWorks if needed
-#zynq_OBJS_vxWorks += $(EPICS_BASE_BIN)/vxComLibrary
-
-# Finally link to the EPICS Base libraries
-zynq_LIBS += $(EPICS_BASE_IOC_LIBS)
-
-#===========================
+zynqMotor_LIBS += zynq motor asyn
+zynqMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES
-#----------------------------------------
-#  ADD RULES AFTER THIS LINE
 
