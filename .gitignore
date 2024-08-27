@@ -3,8 +3,7 @@ bin/
 lib/
 db/
 dbd/
-O.Common/
-O.linux-arm
+O.*
 records.dbl
 envPaths
 *.swp

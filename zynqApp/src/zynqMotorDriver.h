@@ -4,7 +4,7 @@
 
 #include "asynMotorController.h"
 #include "asynMotorAxis.h"
-#include "axi_reg.h"
+//#include "axi_reg.h"
 
 // Register definition
 #define ZYNQ_BASE_ADDR     0x043C0000
@@ -46,8 +46,10 @@ private:
     zynqMotorController *pC_;   // Pointer to the asynMotorController to which this axis belongs.
     int axisNo_;
 
+#ifndef DBG
     std::unique_ptr<axi_reg>  reg_p;
-    
+#endif
+
     uintptr_t axisBaseAddr;
 
     static const uintptr_t motorBaseAddr      = 0x50;

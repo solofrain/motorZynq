@@ -30,6 +30,7 @@
 
 # EPICS_BASE should appear last so earlier modules can override stuff:
 EPICS_BASE = /usr/lib/epics
+MOTOR = /epics/support/synApps_6_3/support/motor-R7-3-1
 
 # Set RULES here if you want to use build rules from somewhere
 # other than EPICS_BASE:
