@@ -1,0 +1,16 @@
+##file "$(MOTOR)/db/asyn_motor.db"
+#file "/epics/base/base-7.0.8.1/synApps_6_3/support/motor-R7-3-1/db/asyn_motor.db"
+#{
+#pattern
+#{N, P,     M,          DTYP,         PORT,  ADDR,  DESC,          EGU, DIR,  VELO,  VBAS,  ACCL,  BDST,  BVEL,  BACC,  MRES,  PREC,  DHLM,  DLLM,  INIT}
+#{1, "Det", "Mtr:1",  "asynMotor",  ZMTR,  0,     "motor 1",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+#{2, "Det", "Mtr:2",  "asynMotor",  ZMTR,  1,     "motor 2",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+#}
+#
+file "$(MOTOR)/db/asyn_motor.db"
+{
+pattern
+{N,   M,       DTYP,         PORT,  ADDR,  DESC,          EGU, DIR,  VELO,  VBAS,  ACCL,  BDST,  BVEL,  BACC,  MRES,  PREC,  DHLM,  DLLM,  INIT}
+{1,  "m$(N)",  "asynMotor",  ZMTR,  0,     "motor $(N)",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+{2,  "m$(N)",  "asynMotor",  ZMTR,  1,     "motor $(N)",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+}

@@ -50,6 +50,8 @@ zynqMotorController::zynqMotorController( const char *portName,
 {
     cout << __func__ << ": creating zynqMotorController object..." << endl;
 
+    zynqMotorAxis* pAxis;
+
 #ifndef DBG
     try
     {
@@ -67,10 +69,11 @@ zynqMotorController::zynqMotorController( const char *portName,
       
     for (int axis=0; axis<numAxes; axis++)
     {
-        //pAxis = new zynqMotorAxis(this, axis);
-        new zynqMotorAxis(this, axis);
+        pAxis = new zynqMotorAxis(this, axis);
+        //new zynqMotorAxis(this, axis);
     }
   
+    cout << "Start poller..." << endl;
     startPoller(movingPollPeriod, idlePollPeriod, 2);
 }
 
@@ -145,7 +148,7 @@ void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t valu
 {
     print_func;
     volatile uint32_t* regAddress = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
-#ifdef DBG
+#ifndef DBG
     *regAddress = value;
 #endif
 }
@@ -157,7 +160,7 @@ void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32
     print_func;
     volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
     cout << __func__ << ": register @" << regAddr << endl;
-#ifdef DBG
+#ifndef DBG
     *value = *regAddr;
 #endif
 }
@@ -184,6 +187,7 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
       axisBaseAddr( ZYNQ_BASE_ADDR + MOTOR_BASE_ADDR + axisNo * MOTOR_AX_REG_RANGE )
 {
     print_func;
+    cout << "Creating axis " << axisNo_ << endl;
 }
     
 

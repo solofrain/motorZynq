@@ -11,4 +11,4 @@ info_settings.*
 info_positions.*
 *.dat
 *.bin
-
+.ioc*
