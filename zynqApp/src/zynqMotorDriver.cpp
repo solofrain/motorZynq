@@ -96,11 +96,11 @@ extern "C" int zynqMotorCreateController( const char *portName, const char *zynq
 {
     print_func;
 
-    zynqMotorController(portName, zynqPortName, numAxes, movingPollPeriod/1000., idlePollPeriod/1000.);
-    //zynqMotorController *pzynqMotorController
-    //    = new zynqMotorController(portName, zynqPortName, numAxes, movingPollPeriod/1000., idlePollPeriod/1000.);
+    zynqMotorController *pzynqMotorController
+        = new zynqMotorController(portName, zynqPortName, numAxes, movingPollPeriod/1000., idlePollPeriod/1000.);
     
-    //pzynqMotorController = NULL;
+    pzynqMotorController = NULL;
+
     return(asynSuccess);
 }
 
