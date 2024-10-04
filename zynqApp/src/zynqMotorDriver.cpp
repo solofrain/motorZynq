@@ -130,7 +130,7 @@ void zynqMotorController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 zynqMotorAxis* zynqMotorController::getAxis(asynUser *pasynUser)
 {
-    print_func;
+    //print_func;
     return static_cast<zynqMotorAxis*>(asynMotorController::getAxis(pasynUser));
 }
 
@@ -139,7 +139,7 @@ zynqMotorAxis* zynqMotorController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 zynqMotorAxis* zynqMotorController::getAxis(int axisNo)
 {
-    print_func;
+    //print_func;
     return static_cast<zynqMotorAxis*>(asynMotorController::getAxis(axisNo));
 }
 
@@ -148,6 +148,7 @@ void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t valu
 {
     print_func;
     volatile uint32_t* regAddress = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
+    printf("%s: write %d to register offset %d of axis %d\n", __func__, value, offset, axisNo);
 #ifndef DBG
     *regAddress = value;
 #endif
@@ -157,9 +158,9 @@ void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t valu
 //void zynqMotorController::readReg32( int axisNo, uint32_t offset, uint32_t value )
 void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32* value )
 {
-    print_func;
+    //print_func;
     volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
-    cout << __func__ << ": register @" << regAddr << endl;
+    //cout << __func__ << ": register @" << regAddr << endl;
 #ifndef DBG
     *value = *regAddr;
 #endif
@@ -298,9 +299,9 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
 
     status = sendAccelAndVelocity( accelerationRaw, maxVelocityRaw );
 
-    pC_->writeReg32( axisNo_, motorRegDistanceSP,  0xffffffff ); // move long distance
-    pC_->writeReg32( axisNo_, motorRegDirection, (maxVelocity>0)?0:1 );
-    pC_->writeReg32( axisNo_, motorRegEnable,    1);
+    pC_->writeReg32( axisNo_, motorRegDirection,  (maxVelocity>0)?0:1 );
+    pC_->writeReg32( axisNo_, motorRegDistanceSP, 0xffffffff ); // move long distance
+    pC_->writeReg32( axisNo_, motorRegEnable,     1);
 
     return asynSuccess;
 }
@@ -309,7 +310,9 @@ asynStatus zynqMotorAxis::stop(double acceleration )
 {
     print_func;
 
-    pC_->writeReg32( axisNo_, motorRegEnable, 0);
+    pC_->writeReg32( axisNo_, motorRegEnable, MOTOR_CONTROL_MASK_STOP  |
+                                              MOTOR_CONTROL_MASK_RESET |
+                                              MOTOR_CONTROL_MASK_SLEEP  );
     return asynSuccess;
 }
 

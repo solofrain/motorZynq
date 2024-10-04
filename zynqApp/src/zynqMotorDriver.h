@@ -12,11 +12,15 @@
 #define MOTOR_BASE_ADDR     0x50
 #define MOTOR_AX_REG_RANGE  0x20
 
+// {28'x0, stop, rst_n, sleep_n, en_n}
 #define MOTOR_CONTROL_MASK_ENABLE  0x01
 #define MOTOR_CONTROL_MASK_SLEEP   0x02
 #define MOTOR_CONTROL_MASK_RESET   0x04
+#define MOTOR_CONTROL_MASK_STOP    0X08
 
+// status {30'd0, fault_n, move}
 #define MOTOR_STATUS_MASK_MOVING   0x01
+#define MOTOR_STATUS_MASK_FAULT    0xfffd
 
 #define NUM_ZYNQ_PARAMS 0
 
@@ -52,17 +56,17 @@ private:
 
     uintptr_t axisBaseAddr;
 
-    static const uintptr_t motorBaseAddr      = 0x50;
-    static const uintptr_t motorAxisRegSize   = 0x20;
+    //static const uintptr_t motorBaseAddr      = 0x50;
+    static const uintptr_t motorAxisRegSize   = 0x40;
 
-    static const uintptr_t motorRegControl    = 0x00;
-    static const uintptr_t motorRegMicrostep  = 0x04;
+    static const uintptr_t motorRegControl    = 0x00; // {28'x0, stop, rst_n, sleep_n, en_n}
+    static const uintptr_t motorRegMicrostep  = 0x04; // microstep
     static const uintptr_t motorRegDirection  = 0x08;
-    static const uintptr_t motorRegEnable     = 0x0C; // FPGA clears move to indicate end of moving?
-    static const uintptr_t motorRegSpeed      = 0x10;
-    static const uintptr_t motorRegDistanceSP = 0x14;
-    static const uintptr_t motorRegDistanceRB = 0x18;
-    static const uintptr_t motorRegStatus     = 0x1C;
+    static const uintptr_t motorRegEnable     = 0x0C; // {31'x0, step_en}
+    static const uintptr_t motorRegSpeed      = 0x10; // step rate. motor_speed = step_rate * 2^32/100e6
+    static const uintptr_t motorRegDistanceSP = 0x14; // steps set point
+    static const uintptr_t motorRegDistanceRB = 0x18; // steps readback
+    static const uintptr_t motorRegStatus     = 0x1C; // status {30'd0, fault_n, move}
 
     int      direction;               // 1: positive; -1: negative
     double   positionSP;              // absolute position set point
