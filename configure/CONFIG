@@ -20,6 +20,7 @@ ifneq (file,$(origin EPICS_BASE))
 else
   ifeq ($(wildcard $(EPICS_BASE)/configure/CONFIG_BASE),)
     $(error EPICS_BASE does not point to an EPICS installation)
+    echo $(EPICS_BASE)
   endif
 endif
 
