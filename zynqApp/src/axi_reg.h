@@ -10,7 +10,7 @@ class axi_reg
 {
 private:
     uint32_t axi_base_addr;
-    uint8_t  *reg;
+    uint32_t *reg;
     size_t   reg_size;
     spinlock reg_lock;
 

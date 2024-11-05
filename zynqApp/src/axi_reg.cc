@@ -32,7 +32,7 @@ using std::endl;
 //=========================================
 axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
                                           reg(nullptr),
-                                          reg_size(0)
+                                          reg_size(0x10000)
 {
     cout << __func__ << ": constructing axi_reg object..." << endl;
 
@@ -44,12 +44,12 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
 
     try
     {
-        reg_size = getpagesize();
-        reg = static_cast<uint8_t *>( mmap( nullptr, reg_size,
-                                            PROT_READ | PROT_WRITE,
-                                            MAP_SHARED,
-                                            fd,
-                                            axi_base_addr));
+        //reg_size = getpagesize();
+        reg = static_cast<uint32_t *>( mmap( nullptr, reg_size,
+                                             PROT_READ | PROT_WRITE,
+                                             MAP_SHARED,
+                                             fd,
+                                             axi_base_addr));
     }
     catch (const std::exception& e)
     {
@@ -58,13 +58,14 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
     }
 
 
-	close(fd);
+    close(fd);
+    
+    if(reg == MAP_FAILED)
+    {
+        throw std::runtime_error("Memory mapping failed");
+    }
 
-	if(reg == MAP_FAILED)
-	{
-	    throw std::runtime_error("Memory mapping failed");
-	}
-    cout << __func__ << ": axi_reg object constructed..." << endl;
+    cout << __func__ << ": axi_reg object created at 0x" << static_cast<void*>(reg) << endl;
 }
 
 
@@ -94,7 +95,8 @@ uint32_t axi_reg::reg_rd(size_t offset)
         throw std::runtime_error("Offset must be aligned to register size");
     }
 
-    volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
+    //volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
+    volatile uint32_t *registerPtr = reg + offset / sizeof(uint32_t);
     reg_lock.lock();
     val = *registerPtr;
     reg_lock.unlock();
@@ -103,6 +105,8 @@ uint32_t axi_reg::reg_rd(size_t offset)
     cout << __func__ << std::hex
          << ": read 0x" << val
 	 << " @ 0x" << offset
+	 << " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr)) << ")"
+	 //<< " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr))
 	 << endl;
 
     //io_wait();
@@ -123,7 +127,8 @@ void axi_reg::reg_wr(size_t offset, uint32_t value)
         throw std::runtime_error("Offset must be aligned to register size");
     }
 
-    volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
+    //volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
+    volatile uint32_t *registerPtr = reg + offset / sizeof(uint32_t);
     reg_lock.lock();
     *registerPtr = value;
     reg_lock.unlock();
@@ -131,8 +136,9 @@ void axi_reg::reg_wr(size_t offset, uint32_t value)
 
     cout << __func__ << std::hex
          << ": write 0x" << value
-	 << " to 0x" << offset << endl;
-
+	 << " to 0x" << offset
+	 << " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr)) << ")"
+         << endl;
 
     reg_rd(offset);
     //io_wait();

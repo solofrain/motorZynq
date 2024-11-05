@@ -181,7 +181,8 @@ void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32
 
 uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
 {
-    return axisNo * MOTOR_AX_REG_RANGE + MOTOR_BASE_ADDR;
+    return axisNo * motorAxRegSize + motorRegOffset;
+    //return axisNo * MOTOR_AX_REG_RANGE + MOTOR_BASE_ADDR;
 }
 
 //====================================================================
@@ -197,8 +198,9 @@ uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
 zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
     : asynMotorAxis(pC, axisNo),
       pC_(pC),
-      axisNo_(axisNo),
-      axisBaseAddr( ZYNQ_BASE_ADDR + MOTOR_BASE_ADDR + axisNo * MOTOR_AX_REG_RANGE )
+      axisNo_(axisNo)
+      //axisBaseAddr( regBaseAddress + motorRegOffset + axisNo * motorAxRegSize )
+      //axisBaseAddr( ZYNQ_BASE_ADDR + MOTOR_BASE_ADDR + axisNo * MOTOR_AX_REG_RANGE )
 {
     print_func;
     cout << "Creating axis " << axisNo_ << endl;
@@ -236,7 +238,7 @@ asynStatus zynqMotorAxis::sendAccelAndVelocity( uint32_t acceleration, uint32_t 
     //ival = NINT( fabs(115200./velocity) );
     //if (ival < 2) ival=2;
     //if (ival > 255) ival = 255;
-    cout << "velocity is " << velocity;
+    cout << "velocity is " << velocity << endl;;
     pC_->writeReg32( axisNo_, motorRegSpeed, velocity );
       
     // Send the acceleration
@@ -297,7 +299,7 @@ asynStatus zynqMotorAxis::move( double position,
 
     cout << __func__
 	 << ": motor " << axisNo_
-	 << " moved to destination." << endl;
+	 << " commanded to move to destination." << endl;
     return status;
 }
 
@@ -376,10 +378,12 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   if ( motorStatus & MOTOR_STATUS_MASK_MOVING )
   {
       *moving = true;
+      cout << __func__ << ": axis " << axisNo_ << " moving" << endl;
   }
   else
   {
       *moving = false;
+      cout << __func__ << ": axis " << axisNo_ << " not moving" << endl;
       positionSPRaw = positionRBRaw;
   }
 

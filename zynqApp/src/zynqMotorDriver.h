@@ -6,21 +6,6 @@
 #include "asynMotorAxis.h"
 #include "axi_reg.h"
 
-// Register definition
-#define ZYNQ_BASE_ADDR     0x043C0000
-
-#define MOTOR_BASE_ADDR     0x1000
-#define MOTOR_AX_REG_RANGE  0x40
-
-// {28'x0, stop, rst_n, sleep_n, en_n}
-#define MOTOR_CONTROL_MASK_ENABLE  0x01
-#define MOTOR_CONTROL_MASK_SLEEP   0x02
-#define MOTOR_CONTROL_MASK_RESET   0x04
-#define MOTOR_CONTROL_MASK_STOP    0X08
-
-// status {30'd0, fault_n, move}
-#define MOTOR_STATUS_MASK_MOVING   0x01
-#define MOTOR_STATUS_MASK_FAULT    0xfffd
 
 #define NUM_ZYNQ_PARAMS 0
 
@@ -50,11 +35,6 @@ private:
     zynqMotorController *pC_;   // Pointer to the asynMotorController to which this axis belongs.
     int axisNo_;
 
-    uintptr_t axisBaseAddr;
-
-    //static const uintptr_t motorBaseAddr      = 0x50;
-    static const uintptr_t motorAxisRegSize   = 0x40;
-
     static const uintptr_t motorRegControl    = 0x00; // {28'x0, stop, rst_n, sleep_n, en_n}
     static const uintptr_t motorRegMicrostep  = 0x04; // microstep
     static const uintptr_t motorRegDirection  = 0x08;
@@ -63,6 +43,17 @@ private:
     static const uintptr_t motorRegDistanceSP = 0x14; // steps set point
     static const uintptr_t motorRegDistanceRB = 0x18; // steps readback
     static const uintptr_t motorRegStatus     = 0x1C; // status {30'd0, fault_n, move}
+
+    // Register masks
+    //   Motor control {28'x0, stop, rst_n, sleep_n, en_n}
+    static const uint32_t MOTOR_CONTROL_MASK_ENABLE = 0x01;
+    static const uint32_t MOTOR_CONTROL_MASK_SLEEP  = 0x02;
+    static const uint32_t MOTOR_CONTROL_MASK_RESET  = 0x04;
+    static const uint32_t MOTOR_CONTROL_MASK_STOP   = 0X08;
+
+    //   Motor status {30'd0, fault_n, move}
+    static const uint32_t MOTOR_STATUS_MASK_MOVING  = 0x01;
+    static const uint32_t MOTOR_STATUS_MASK_FAULT   = 0x02;
 
     int      direction;               // 1: positive; -1: negative
     double   positionSP;              // absolute position set point
@@ -107,8 +98,9 @@ public:
 private:
     uint32_t getAxisOffset(uint32_t axis);
 
-    uintptr_t regBaseAddress = 0x43C00000;
-    uint32_t  motorRegOffset = 0x1000;
+    const uintptr_t regBaseAddress = 0x43C00000;
+    const uint32_t  motorRegOffset = 0x1000;
+    const uint32_t  motorAxRegSize = 0x40;
     std::unique_ptr<axi_reg>  reg_p;
 
 
