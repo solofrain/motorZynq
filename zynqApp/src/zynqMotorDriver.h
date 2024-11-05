@@ -4,13 +4,13 @@
 
 #include "asynMotorController.h"
 #include "asynMotorAxis.h"
-//#include "axi_reg.h"
+#include "axi_reg.h"
 
 // Register definition
 #define ZYNQ_BASE_ADDR     0x043C0000
 
-#define MOTOR_BASE_ADDR     0x50
-#define MOTOR_AX_REG_RANGE  0x20
+#define MOTOR_BASE_ADDR     0x1000
+#define MOTOR_AX_REG_RANGE  0x40
 
 // {28'x0, stop, rst_n, sleep_n, en_n}
 #define MOTOR_CONTROL_MASK_ENABLE  0x01
@@ -24,7 +24,7 @@
 
 #define NUM_ZYNQ_PARAMS 0
 
-#define DBG
+//#define DBG
 
 #ifdef DBG
 #define print_func   cout<<__func__<<endl
@@ -49,10 +49,6 @@ public:
 private:
     zynqMotorController *pC_;   // Pointer to the asynMotorController to which this axis belongs.
     int axisNo_;
-
-#ifndef DBG
-    std::unique_ptr<axi_reg>  reg_p;
-#endif
 
     uintptr_t axisBaseAddr;
 
@@ -109,9 +105,12 @@ public:
     zynqMotorAxis* getAxis(int axisNo);
 
 private:
-    uintptr_t getAxisOffset(uint32_t axis);
+    uint32_t getAxisOffset(uint32_t axis);
 
-    uintptr_t baseAddress = 0x43C00000;
+    uintptr_t regBaseAddress = 0x43C00000;
+    uint32_t  motorRegOffset = 0x1000;
+    std::unique_ptr<axi_reg>  reg_p;
+
 
 friend class zynqMotorAxis;
 

@@ -55,7 +55,7 @@ zynqMotorController::zynqMotorController( const char *portName,
 #ifndef DBG
     try
     {
-        reg_p = std::make_unique<axi_reg>(reg_base_addr);
+        reg_p = std::make_unique<axi_reg>(regBaseAddress);
     }
     catch (const std::exception &e)
     {
@@ -147,10 +147,16 @@ zynqMotorAxis* zynqMotorController::getAxis(int axisNo)
 void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t value )
 {
     print_func;
-    volatile uint32_t* regAddress = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
-    printf("%s: write %d to register offset %d of axis %d\n", __func__, value, offset, axisNo);
+    //volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(regBaseAddress + getAxisOffset(axisNo) + offset);
+    uint32_t regAddr = getAxisOffset( axisNo ) + offset;
+    cout << __func__
+	 << ": write " << value
+	 << " to register " << regAddr 
+	 << " for axis " << axisNo
+	 << endl;
 #ifndef DBG
-    *regAddress = value;
+    //*regAddr = value;
+    reg_p->reg_wr( getAxisOffset(axisNo) + offset, value );
 #endif
 }
 
@@ -159,14 +165,21 @@ void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t valu
 void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32* value )
 {
     //print_func;
-    volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(baseAddress + getAxisOffset(axisNo) + offset);
-    //cout << __func__ << ": register @" << regAddr << endl;
+    //volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(regBaseAddress + getAxisOffset(axisNo) + offset);
+    uint32_t regAddr = getAxisOffset( axisNo ) + offset;
 #ifndef DBG
-    *value = *regAddr;
+    //*value = *regAddr;
+    *value = reg_p->reg_rd( getAxisOffset( axisNo ) + offset );
+
+    cout << __func__
+	 << ": read " << *value
+	 << " from register " << regAddr
+	 << " for axis " << axisNo
+	 << endl;
 #endif
 }
 
-uintptr_t zynqMotorController::getAxisOffset(uint32_t axisNo)
+uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
 {
     return axisNo * MOTOR_AX_REG_RANGE + MOTOR_BASE_ADDR;
 }
@@ -213,8 +226,7 @@ void zynqMotorAxis::report(FILE *fp, int level)
 
 asynStatus zynqMotorAxis::sendAccelAndVelocity( uint32_t acceleration, uint32_t velocity ) 
 {
-    print_func;
-    cout << "Axis " << axisNo_ << endl;
+    cout << __func__ << ": axis " << axisNo_ << endl;
 
     //asynStatus status;
     //int ival;
@@ -237,7 +249,7 @@ asynStatus zynqMotorAxis::sendAccelAndVelocity( uint32_t acceleration, uint32_t 
     //if (ival > 255) ival=255;
     //sprintf(pC_->outString_, "#%02dR=%d", axisNo_, ival);
     //status = pC_->writeReadController();
-    cout << "acceleration is " << acceleration;
+    cout << "acceleration is " << acceleration << endl;
 
     return asynSuccess;
 }
@@ -249,8 +261,11 @@ asynStatus zynqMotorAxis::move( double position,
                                 double maxVelocity,
                                 double acceleration )
 {
-    print_func;
-    cout << "Axis " << axisNo_ << ": move()" << endl;
+    cout << __func__
+	 << ": axis " << axisNo_
+	 << " move to " << position
+	 << " (" << relative << ")"
+	 << endl;
 
     int32_t moveDistance; 
     asynStatus status;
@@ -280,13 +295,17 @@ asynStatus zynqMotorAxis::move( double position,
     pC_->writeReg32( axisNo_, motorRegDirection, (moveDistance>0)?0:1 );
     pC_->writeReg32( axisNo_, motorRegEnable,    1);
 
+    cout << __func__
+	 << ": motor " << axisNo_
+	 << " moved to destination." << endl;
     return status;
 }
 
 
 asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
 {
-    print_func;
+
+    cout << __func__ << endl;
 
     epicsStatus status;
 
@@ -308,7 +327,7 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
 
 asynStatus zynqMotorAxis::stop(double acceleration )
 {
-    print_func;
+    cout << __func__ << endl;
 
     pC_->writeReg32( axisNo_, motorRegEnable, MOTOR_CONTROL_MASK_STOP  |
                                               MOTOR_CONTROL_MASK_RESET |
@@ -335,7 +354,9 @@ asynStatus zynqMotorAxis::setPosition(double position)
   * and then calls callParamCallbacks() at the end.
   * \param[out] moving A flag that is set indicating that the axis is moving (true) or done (false). */
 asynStatus zynqMotorAxis::poll(bool *moving)
-{ 
+{
+  cout << __func__ << endl;
+
   //int done;
   //int driveOn;
   //int limit;

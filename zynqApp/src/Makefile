@@ -21,7 +21,7 @@ zynqMotorSupport_DBD += zynqMotor.dbd
 
 # Advanced Control Systems driver support.
 #SRCS += devZynqMotor.c drvMCB4B.c
-zynqMotor_SRCS += zynqMotorDriver.cpp 
+zynqMotor_SRCS += zynqMotorDriver.cpp axi_reg.cc spinlock.cc
 #zynqMotor_SRCS += axi_reg.cc spinlock.cc
 
 zynqMotor_LIBS += motor asyn
