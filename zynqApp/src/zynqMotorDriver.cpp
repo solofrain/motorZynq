@@ -318,30 +318,24 @@ asynStatus zynqMotorAxis::move( double position,
 
     int32_t moveDistance;
     asynStatus status;
-    //minVelocityRaw  = minVelocity;//  * resolutionCntPerEGU;
-    //maxVelocityRaw  = maxVelocity;//  * resolutionCntPerEGU;
-    //accelerationRaw = acceleration;// * resolutionCntPerEGU;
 
-    //status = sendAccelAndVelocity( acceleration, maxVelocity );
+    status = sendAccelAndVelocity( NINT(acceleration), NINT(maxVelocity) );
     
-    cout << "Current position = " << positionSP << endl;
+    cout << "Current position = " << positionRB << endl;
     if ( relative ) // relative move
     {
-        positionSP      += NINT(position);
-        //moveDistance     = static_cast<int>(position * resolutionCntPerEGU);
+        positionSP    = positionRB + NINT(position);
 	moveDistance  = NINT(position);
     }
     else
     {
-        //moveDistance    = static_cast<int>(position - positionSP) * resolutionCntPerEGU;
-	moveDistance = NINT(position - positionSP);
-        positionSP      = NINT(position);
+	moveDistance = NINT(position - positionRB);
+        positionSP   = NINT(position);
     }
     cout << "New position = " << positionSP << endl;
     cout << "moveDistance = " << moveDistance << endl;
 
     direction       = (moveDistance<0) ? -1 : 1;
-    //positionSPRaw += moveDistance;
     
     cout << "Move " << moveDistance << " counts to " << positionSP << endl;
 
@@ -371,7 +365,7 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
     //uint32_t maxVelocityRaw  = maxVelocity * resolutionCntPerEGU;
     //uint32_t accelerationRaw = acceleration * resolutionCntPerEGU;
 
-    //status = sendAccelAndVelocity( acceleration, maxVelocity );
+    status = sendAccelAndVelocity( NINT(acceleration), NINT(maxVelocity) );
 
     pC_->writeReg32( axisNo_, motorRegDirection,  (maxVelocity>0)?0:1 );
     pC_->writeReg32( axisNo_, motorRegDistanceSP, 0xffffffff ); // move long distance
@@ -396,9 +390,8 @@ asynStatus zynqMotorAxis::setPosition(double position)
 {
     print_func;
 
-    positionSP       = NINT( position );
-    //positionSPRaw    = position * resolutionCntPerEGU;
-    //positionStartRaw = positionSPRaw;
+    positionSP = NINT( position );
+    positionRB = positionSP;
 
     cout << __func__
 	 << ": set axis " << axisNo_
