@@ -30,6 +30,9 @@ public:
     asynStatus poll(bool *moving);
     asynStatus setPosition(double position);
     //asynStatus setClosedLoop(bool closedLoop);
+    asynStatus setMicrostep( uint32_t microstep );
+    asynStatus setStepRate( uint32_t stepRate );
+    asynStatus setResolution( uint32_t resolution );
 
 private:
     zynqMotorController *pC_;   // Pointer to the asynMotorController to which this axis belongs.
@@ -56,16 +59,16 @@ private:
     static const uint32_t MOTOR_STATUS_MASK_FAULT   = 0x02;
 
     int      direction;               // 1: positive; -1: negative
-    double   positionSP;              // absolute position set point
-    double   positionRB;              // absolute position readback value
-    uint32_t positionStartRaw;        // position start point in counts
-    uint32_t positionSPRaw;           // absolute position set point in counts
-    uint32_t positionRBRaw;           // absolute position readback value in counts
-    uint32_t minVelocityRaw;          // minimum velocity
-    uint32_t maxVelocityRaw;          // maximum velocity
-    uint32_t accelerationRaw;         // acceleration in count
-    uint32_t speedAdjStepRaw;         // speed increase/decrease step
-    uint32_t speedAadjIntervalRaw;    // speed increase/decrease interval
+    int   positionSP;              // absolute position set point
+    int   positionRB;              // absolute position readback value
+    //uint32_t positionStartRaw;        // position start point in counts
+    //uint32_t positionSPRaw;           // absolute position set point in counts
+    //uint32_t positionRBRaw;           // absolute position readback value in counts
+    //uint32_t minVelocityRaw;          // minimum velocity
+    //uint32_t maxVelocityRaw;          // maximum velocity
+    //uint32_t accelerationRaw;         // acceleration in count
+    //uint32_t speedAdjStepRaw;         // speed increase/decrease step
+    //uint32_t speedAadjIntervalRaw;    // speed increase/decrease interval
 
     uint32_t resolutionCntPerEGU;     // resolution in cnt/EGU
 

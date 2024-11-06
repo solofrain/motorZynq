@@ -95,7 +95,6 @@ uint32_t axi_reg::reg_rd(size_t offset)
         throw std::runtime_error("Offset must be aligned to register size");
     }
 
-    //volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
     volatile uint32_t *registerPtr = reg + offset / sizeof(uint32_t);
     reg_lock.lock();
     val = *registerPtr;
@@ -106,7 +105,6 @@ uint32_t axi_reg::reg_rd(size_t offset)
          << ": read 0x" << val
 	 << " @ 0x" << offset
 	 << " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr)) << ")"
-	 //<< " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr))
 	 << endl;
 
     //io_wait();
@@ -127,7 +125,6 @@ void axi_reg::reg_wr(size_t offset, uint32_t value)
         throw std::runtime_error("Offset must be aligned to register size");
     }
 
-    //volatile uint32_t *registerPtr = reinterpret_cast<volatile uint32_t *>(reg + offset);
     volatile uint32_t *registerPtr = reg + offset / sizeof(uint32_t);
     reg_lock.lock();
     *registerPtr = value;
@@ -141,7 +138,6 @@ void axi_reg::reg_wr(size_t offset, uint32_t value)
          << endl;
 
     reg_rd(offset);
-    //io_wait();
 }
 
 /*

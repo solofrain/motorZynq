@@ -12,7 +12,7 @@ Ji Li
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 
 #include <iocsh.h>
 #include <epicsThread.h>
@@ -26,7 +26,8 @@ Ji Li
 using std::cout;
 using std::endl;
 
-#define NINT(f) (int)((f)>0 ? (f)+0.5 : (f)-0.5)
+//#define NINT(f) (int)((f)>0 ? (f)+0.5 : (f)-0.5)
+#define NINT(f) std::round(f)
 
 /** Creates a new zynqMotorController object.
   * \param[in] portName          The name of the asyn port that will be created for this driver
@@ -204,8 +205,16 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
 {
     print_func;
     cout << "Creating axis " << axisNo_ << endl;
+
+    setMicrostep( 0 );
+    setStepRate( 42950 );
+    setResolution ( 400 );
 }
     
+asynStatus zynqMotorAxis::setResolution( uint32_t resolution )
+{
+    resolutionCntPerEGU = resolution;
+}
 
 /** Reports on status of the axis
   * \param[in] fp The file pointer on which report information will be written
@@ -224,6 +233,26 @@ void zynqMotorAxis::report(FILE *fp, int level)
 
     // Call the base class method
     asynMotorAxis::report(fp, level);
+}
+
+asynStatus zynqMotorAxis::setMicrostep( uint32_t microstep )
+{
+    cout << __func__
+	 << ": set microstep = " << microstep
+	 << endl;
+    pC_->writeReg32( axisNo_, motorRegMicrostep, microstep );
+
+    return asynSuccess;
+}
+
+asynStatus zynqMotorAxis::setStepRate( uint32_t stepRate )
+{
+    cout << __func__
+	 << ": set microstep = " << stepRate
+	 << endl;
+    pC_->writeReg32( axisNo_, motorRegSpeed, stepRate );
+
+    return asynSuccess;
 }
 
 asynStatus zynqMotorAxis::sendAccelAndVelocity( uint32_t acceleration, uint32_t velocity ) 
@@ -265,33 +294,41 @@ asynStatus zynqMotorAxis::move( double position,
 {
     cout << __func__
 	 << ": axis " << axisNo_
-	 << " move to " << position
-	 << " (" << relative << ")"
+	 << " move to position " << position
+	 << ( relative ? " (relative) " : " (absolute) " )
+         << ", v_min = " << minVelocity
+	 << ", v_max = " << maxVelocity
+	 << ", acceleration = " << acceleration
 	 << endl;
 
-    int32_t moveDistance; 
+    int32_t moveDistance;
     asynStatus status;
-    minVelocityRaw  = minVelocity  * resolutionCntPerEGU;
-    maxVelocityRaw  = maxVelocity  * resolutionCntPerEGU;
-    accelerationRaw = acceleration * resolutionCntPerEGU;
+    //minVelocityRaw  = minVelocity;//  * resolutionCntPerEGU;
+    //maxVelocityRaw  = maxVelocity;//  * resolutionCntPerEGU;
+    //accelerationRaw = acceleration;// * resolutionCntPerEGU;
 
-    status = sendAccelAndVelocity( accelerationRaw, maxVelocityRaw );
+    //status = sendAccelAndVelocity( acceleration, maxVelocity );
     
+    cout << "Current position = " << positionSP << endl;
     if ( relative ) // relative move
     {
-        positionSP      += position;
-        moveDistance     = static_cast<int>(position * resolutionCntPerEGU);
+        positionSP      += NINT(position);
+        //moveDistance     = static_cast<int>(position * resolutionCntPerEGU);
+	moveDistance  = NINT(position);
     }
     else
     {
-        
-        positionSP      = position;
-        moveDistance    = static_cast<int>(position - positionSP) * resolutionCntPerEGU;
+        //moveDistance    = static_cast<int>(position - positionSP) * resolutionCntPerEGU;
+	moveDistance = NINT(position - positionSP);
+        positionSP      = NINT(position);
     }
-    position       = (moveDistance<0) ? -1 : 1;
-    positionSPRaw += moveDistance;
+    cout << "New position = " << positionSP << endl;
+    cout << "moveDistance = " << moveDistance << endl;
+
+    direction       = (moveDistance<0) ? -1 : 1;
+    //positionSPRaw += moveDistance;
     
-    cout << "Move " << moveDistance << " counts to " << positionSPRaw << endl;
+    cout << "Move " << moveDistance << " counts to " << positionSP << endl;
 
     pC_->writeReg32( axisNo_, motorRegDistanceSP, abs(moveDistance) );
     pC_->writeReg32( axisNo_, motorRegDirection, (moveDistance>0)?0:1 );
@@ -315,10 +352,10 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
     //  "%s: minVelocity=%f, maxVelocity=%f, acceleration=%f\n",
     //  __func__, minVelocity, maxVelocity, acceleration);
     
-    uint32_t maxVelocityRaw  = maxVelocity * resolutionCntPerEGU;
-    uint32_t accelerationRaw = acceleration * resolutionCntPerEGU;
+    //uint32_t maxVelocityRaw  = maxVelocity * resolutionCntPerEGU;
+    //uint32_t accelerationRaw = acceleration * resolutionCntPerEGU;
 
-    status = sendAccelAndVelocity( accelerationRaw, maxVelocityRaw );
+    //status = sendAccelAndVelocity( acceleration, maxVelocity );
 
     pC_->writeReg32( axisNo_, motorRegDirection,  (maxVelocity>0)?0:1 );
     pC_->writeReg32( axisNo_, motorRegDistanceSP, 0xffffffff ); // move long distance
@@ -341,9 +378,14 @@ asynStatus zynqMotorAxis::setPosition(double position)
 {
     print_func;
 
-    positionSP       = position;
-    positionSPRaw    = position * resolutionCntPerEGU;
-    positionStartRaw = positionSPRaw;
+    positionSP       = NINT( position );
+    //positionSPRaw    = position * resolutionCntPerEGU;
+    //positionStartRaw = positionSPRaw;
+
+    cout << __func__
+	 << ": set axis " << axisNo_
+	 << " position to " << positionSP
+	 << endl;
 
     return asynSuccess;
 }
@@ -357,7 +399,9 @@ asynStatus zynqMotorAxis::setPosition(double position)
   * \param[out] moving A flag that is set indicating that the axis is moving (true) or done (false). */
 asynStatus zynqMotorAxis::poll(bool *moving)
 {
-  cout << __func__ << endl;
+  cout << __func__
+       << ": axis " << axisNo_
+       << endl;
 
   //int done;
   //int driveOn;
@@ -366,12 +410,22 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   //asynStatus comStatus;
   epicsUInt32 motorStatus;
 
+  // Read motor speed
+  uint32_t speed;
+  pC_->readReg32( axisNo_, motorRegSpeed, &speed );
+  cout << "set status: velocity = " << speed << endl;
+  //setIntegerParam( pC_->motorVelocity_, speed );
+
   // Read the distance the motor has moved
   uint32_t moved;
   pC_->readReg32( axisNo_, motorRegDistanceRB, &moved );
 
-  positionRBRaw += positionSPRaw + direction * moved; 
-  positionRB     = positionRBRaw * resolutionCntPerEGU;
+  //positionRBRaw += positionSPRaw + direction * moved; 
+  //positionRB     = positionRBRaw * resolutionCntPerEGU;
+  positionRB = positionSP + direction * moved;
+  cout << "set status: position = " << positionRB << endl;
+  //setIntegerParam(pC_->motorPosition_, positionRBRaw);
+  setDoubleParam(pC_->motorPosition_, positionRB);
 
   // Read the moving status of this motor
   pC_->readReg32( axisNo_, motorRegStatus, &motorStatus );
@@ -384,8 +438,12 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   {
       *moving = false;
       cout << __func__ << ": axis " << axisNo_ << " not moving" << endl;
-      positionSPRaw = positionRBRaw;
+      positionSP = positionRB;
   }
+  cout << "set status: done = " << ( moving ? 0 : 1 ) << endl;
+  setIntegerParam(pC_->motorStatusDone_, moving ? 0 : 1);
+  cout << "set status: moving = " << ( moving ? 1 : 0 ) << endl;
+  setIntegerParam(pC_->motorStatusMoving_, moving ? 1 : 0);
 
   // Read the limit status
 
