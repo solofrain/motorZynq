@@ -55,12 +55,12 @@ private:
     static const uint32_t MOTOR_CONTROL_MASK_STOP   = 0X08;
 
     //   Motor status {30'd0, fault_n, move}
-    static const uint32_t MOTOR_STATUS_MASK_MOVING  = 0x01;
-    static const uint32_t MOTOR_STATUS_MASK_FAULT   = 0x02;
+    static const uint32_t MOTOR_STATUS_MASK_FAULT   = 0x01;
+    static const uint32_t MOTOR_STATUS_MASK_MOVING  = 0x02;
 
-    int      direction;               // 1: positive; -1: negative
-    int   positionSP;              // absolute position set point
-    int   positionRB;              // absolute position readback value
+    int   direction  = 1;               // 1: positive; -1: negative
+    int   positionSP = 0;              // absolute position set point
+    int   positionRB = 0;              // absolute position readback value
     //uint32_t positionStartRaw;        // position start point in counts
     //uint32_t positionSPRaw;           // absolute position set point in counts
     //uint32_t positionRBRaw;           // absolute position readback value in counts
@@ -104,8 +104,8 @@ private:
     const uintptr_t regBaseAddress = 0x43C00000;
     const uint32_t  motorRegOffset = 0x1000;
     const uint32_t  motorAxRegSize = 0x40;
-    std::unique_ptr<axi_reg>  reg_p;
 
+    std::unique_ptr<axi_reg>  reg_p;
 
 friend class zynqMotorAxis;
 
