@@ -18,13 +18,30 @@ zynq_registerRecordDeviceDriver(pdbbase)
 ## Load record instances
 dbLoadTemplate("db/zynqMotor.substitutions", "Sys=$(Sys),Dev=$(Dev),Port=$(Port)")
 
-#dbLoadRecords("$(MOTOR)/db/asyn_motor.db","P=$(Sys),M={${Dev}-Ax:X},DTYP=asynMotor,PORT=ZMTR,ADDR=0,DESC=X,EGU=mm,DIR=Pos,VELO=1,VBAS=.1,ACCL=.2,BDST=0,BVEL=1,BACC=.2,MRES=.0025,PREC=4,DHLM=0,DLLM=0,INIT=")
-#dbLoadRecords("$(MOTOR)/db/asyn_motor.db","P=$(Sys),M={${Dev}-Ax:Y},DTYP=asynMotor,PORT=ZMTR,ADDR=1,DESC=Y,EGU=mm,DIR=Pos,VELO=1,VBAS=.1,ACCL=.2,BDST=0,BVEL=1,BACC=.2,MRES=.01,PREC=4,DHLM=0,DLLM=0,INIT=")
+## Create motor controller
+zynqMotorCreateController($(Port), "ZMTR_MM", 2, 250, 1000)
+#zynqMotorCreateController($(Port), "ZMTR_MM", 2, 10000, 10000)
 
-#zynqMotorCreateController($(Port), "ZMTR_MM", 2, 250, 1000)
-zynqMotorCreateController($(Port), "ZMTR_MM", 2, 10000, 10000)
+
+## autosave/restore machinery
+save_restoreSet_Debug(0)
+save_restoreSet_IncompleteSetsOk(1)
+save_restoreSet_DatedBackupFiles(1)
+
+set_savefile_path("${TOP}/as","/save")
+set_requestfile_path("${TOP}/as","/req")
+
+set_pass0_restoreFile("info_positions.sav")
+set_pass0_restoreFile("info_settings.sav")
+set_pass1_restoreFile("info_settings.sav")
+
 
 iocInit()
+
+cd ${TOP}/as/req
+makeAutosaveFiles()
+create_monitor_set("info_positions.req", 5 , "")
+create_monitor_set("info_settings.req", 15 , "")
 
 
 dbl

@@ -6,8 +6,7 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install) into <top>/db
 # databases, templates, substitutions like this
-DB_INSTALLS += $(MOTOR)/db/asyn_motor.db
-DB_INSTALLS += $(MOTOR)/db/motor.db
+DB += asyn_motor.db
 DB += zynqMotor.substitutions
 
 #----------------------------------------------------

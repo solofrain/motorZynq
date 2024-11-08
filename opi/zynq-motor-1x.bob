@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <macros>
+    <Dev></Dev>
+    <Sys>Det</Sys>
+  </macros>
+  <width>912</width>
+  <height>60</height>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="group" version="2.0.0">
+    <width>912</width>
+    <height>60</height>
+    <widget type="action_button" version="3.0.0">
+      <name>Menu Button_1</name>
+      <actions>
+        <action type="open_display">
+          <file>zynq-motor_config.bob</file>
+          <target>tab</target>
+          <description>Motor Config</description>
+        </action>
+        <action type="open_display">
+          <file>motor_home.opi</file>
+          <target>tab</target>
+          <description>Home Axis</description>
+        </action>
+        <action type="open_display">
+          <file>pmacStatus.opi</file>
+          <macros>
+            <DEV>$(CntlDev)</DEV>
+            <SYS>$(CntlSys)</SYS>
+          </macros>
+          <target>tab</target>
+          <description>PMAC Controller Status</description>
+        </action>
+        <action type="open_display">
+          <file>pmacStatusAxis.opi</file>
+          <macros>
+            <AXIS>$(CntlAxis)</AXIS>
+            <DEV>$(CntlDev)</DEV>
+            <SYS>$(CntlSys)</SYS>
+          </macros>
+          <target>tab</target>
+          <description>PMAC Axis Status</description>
+        </action>
+        <action type="open_display">
+          <file>../../adl/asynRecord.opi</file>
+          <macros>
+            <P>$(CntlSys)</P>
+            <R>{$(CntlDev)}Asyn</R>
+          </macros>
+          <target>tab</target>
+          <description>Asyn</description>
+        </action>
+      </actions>
+      <text>More</text>
+      <x>816</x>
+      <width>60</width>
+      <height>22</height>
+      <font>
+        <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <background_color>
+        <color name="F-I" red="190" green="190" blue="190">
+        </color>
+      </background_color>
+      <tooltip>$(actions)</tooltip>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+    <widget type="textentry" version="3.0.0">
+      <name>Text Input_2</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).VAL</pv_name>
+      <x>168</x>
+      <width>150</width>
+      <height>22</height>
+      <background_color>
+        <color red="255" green="255" blue="255">
+        </color>
+      </background_color>
+      <horizontal_alignment>1</horizontal_alignment>
+      <actions>
+      </actions>
+      <rules>
+        <rule name="Set" prop_id="background_color" out_exp="false">
+          <exp bool_exp="pv0==1">
+            <value>
+              <color red="224" green="224" blue="0">
+              </color>
+            </value>
+          </exp>
+          <exp bool_exp="pv0==0">
+            <value>
+              <color name="White" red="255" green="255" blue="255">
+              </color>
+            </value>
+          </exp>
+          <pv_name>$(Sys)$(Dev)$(Mtr).SET</pv_name>
+        </rule>
+      </rules>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+    <widget type="textupdate" version="2.0.0">
+      <name>Text Update_2</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).DESC</pv_name>
+      <width>132</width>
+      <height>22</height>
+      <font>
+        <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <background_color>
+        <color red="255" green="255" blue="255">
+        </color>
+      </background_color>
+      <transparent>true</transparent>
+      <vertical_alignment>1</vertical_alignment>
+      <wrap_words>false</wrap_words>
+      <actions>
+      </actions>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+      <border_color>
+        <color name="green-18" red="0" green="160" blue="0">
+        </color>
+      </border_color>
+    </widget>
+    <widget type="textupdate" version="2.0.0">
+      <name>Text Update_3</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).RBV</pv_name>
+      <x>353</x>
+      <width>146</width>
+      <height>22</height>
+      <background_color>
+        <color red="255" green="255" blue="255">
+        </color>
+      </background_color>
+      <horizontal_alignment>1</horizontal_alignment>
+      <vertical_alignment>1</vertical_alignment>
+      <wrap_words>false</wrap_words>
+      <actions>
+      </actions>
+      <border_width>2</border_width>
+      <border_color>
+        <color name="green-18" red="0" green="160" blue="0">
+        </color>
+      </border_color>
+    </widget>
+    <widget type="led" version="2.0.0">
+      <name>LED_3</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).LLS</pv_name>
+      <x>326</x>
+      <height>22</height>
+      <off_color>
+        <color name="Red OFF" red="100" green="0" blue="0">
+        </color>
+      </off_color>
+      <on_color>
+        <color name="Red ON" red="255" green="0" blue="0">
+        </color>
+      </on_color>
+      <font>
+        <font name="Header 3" family="Liberation Sans" style="BOLD" size="16.0">
+        </font>
+      </font>
+      <foreground_color>
+        <color red="192" green="192" blue="192">
+        </color>
+      </foreground_color>
+      <line_color>
+        <color red="150" green="150" blue="150">
+        </color>
+      </line_color>
+      <square>true</square>
+      <actions>
+      </actions>
+      <tooltip>Negative Limit</tooltip>
+    </widget>
+    <widget type="led" version="2.0.0">
+      <name>LED_4</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).HLS</pv_name>
+      <x>506</x>
+      <height>22</height>
+      <off_color>
+        <color name="Red OFF" red="100" green="0" blue="0">
+        </color>
+      </off_color>
+      <on_color>
+        <color name="Red ON" red="255" green="0" blue="0">
+        </color>
+      </on_color>
+      <font>
+        <font name="Header 3" family="Liberation Sans" style="BOLD" size="16.0">
+        </font>
+      </font>
+      <foreground_color>
+        <color red="192" green="192" blue="192">
+        </color>
+      </foreground_color>
+      <line_color>
+        <color red="150" green="150" blue="150">
+        </color>
+      </line_color>
+      <square>true</square>
+      <actions>
+      </actions>
+      <tooltip>Positive Limit</tooltip>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button_2</name>
+      <actions>
+        <action type="write_pv">
+          <pv_name>$(Sys)$(Dev)$(Mtr).TWF</pv_name>
+          <value>1</value>
+          <description>Tweak Positive Dir</description>
+        </action>
+      </actions>
+      <pv_name>$(Sys)$(Dev)$(Mtr).TWF</pv_name>
+      <text>&gt;</text>
+      <x>718</x>
+      <width>24</width>
+      <height>22</height>
+      <font>
+        <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+    <widget type="textentry" version="3.0.0">
+      <name>Text Input_3</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).TWV</pv_name>
+      <x>563</x>
+      <width>150</width>
+      <height>22</height>
+      <background_color>
+        <color red="255" green="255" blue="255">
+        </color>
+      </background_color>
+      <horizontal_alignment>1</horizontal_alignment>
+      <actions>
+      </actions>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button_3</name>
+      <actions>
+        <action type="write_pv">
+          <pv_name>$(Sys)$(Dev)$(Mtr).TWR</pv_name>
+          <value>1</value>
+          <description>Tweak Negative Dir</description>
+        </action>
+      </actions>
+      <pv_name>$(Sys)$(Dev)$(Mtr).TWR</pv_name>
+      <text>&lt;</text>
+      <x>533</x>
+      <width>24</width>
+      <height>22</height>
+      <font>
+        <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+    <widget type="led" version="2.0.0">
+      <name>LED_5</name>
+      <pv_name>$(Sys)$(Dev)$(Mtr).MOVN</pv_name>
+      <x>140</x>
+      <height>22</height>
+      <font>
+        <font name="Header 3" family="Liberation Sans" style="BOLD" size="16.0">
+        </font>
+      </font>
+      <foreground_color>
+        <color red="192" green="192" blue="192">
+        </color>
+      </foreground_color>
+      <line_color>
+        <color red="150" green="150" blue="150">
+        </color>
+      </line_color>
+      <square>true</square>
+      <actions>
+      </actions>
+      <tooltip>Moving</tooltip>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button_6</name>
+      <actions>
+        <action type="write_pv">
+          <pv_name>$(Sys)$(Dev)$(Mtr).STOP</pv_name>
+          <value>1</value>
+          <description>Stop the motor</description>
+        </action>
+      </actions>
+      <text>STOP</text>
+      <x>751</x>
+      <width>58</width>
+      <height>22</height>
+      <font>
+        <font family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <foreground_color>
+        <color red="255" green="0" blue="0">
+        </color>
+      </foreground_color>
+      <tooltip>$(actions)</tooltip>
+    </widget>
+  </widget>
+</display>

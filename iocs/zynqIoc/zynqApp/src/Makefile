@@ -17,6 +17,7 @@ zynq_DBD += base.dbd
 
 # Include dbd files from all support applications:
 zynq_DBD += asyn.dbd
+zynq_DBD += asSupport.dbd
 zynq_DBD += motorSupport.dbd
 zynq_DBD += zynqMotorSupport.dbd
 
@@ -24,7 +25,7 @@ zynq_DBD += zynqMotorSupport.dbd
 zynq_LIBS += zynqMotor
 zynq_LIBS += motor
 zynq_LIBS += asyn
-
+zynq_LIBS += autosave
 
 # zynq_registerRecordDeviceDriver.cpp derives from zynq.dbd
 zynq_SRCS += zynq_registerRecordDeviceDriver.cpp

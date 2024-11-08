@@ -140,7 +140,6 @@ zynqMotorAxis* zynqMotorController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 zynqMotorAxis* zynqMotorController::getAxis(int axisNo)
 {
-    //print_func;
     return static_cast<zynqMotorAxis*>(asynMotorController::getAxis(axisNo));
 }
 
@@ -148,28 +147,20 @@ zynqMotorAxis* zynqMotorController::getAxis(int axisNo)
 void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t value )
 {
     print_func;
-    //volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(regBaseAddress + getAxisOffset(axisNo) + offset);
     uint32_t regAddr = getAxisOffset( axisNo ) + offset;
     cout << __func__
 	 << ": write " << value
 	 << " to register " << regAddr 
 	 << " for axis " << axisNo
 	 << endl;
-#ifndef DBG
-    //*regAddr = value;
     reg_p->reg_wr( getAxisOffset(axisNo) + offset, value );
-#endif
 }
 
 
 //void zynqMotorController::readReg32( int axisNo, uint32_t offset, uint32_t value )
 void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32* value )
 {
-    //print_func;
-    //volatile uint32_t* regAddr = reinterpret_cast<volatile uint32_t*>(regBaseAddress + getAxisOffset(axisNo) + offset);
     uint32_t regAddr = getAxisOffset( axisNo ) + offset;
-#ifndef DBG
-    //*value = *regAddr;
     *value = reg_p->reg_rd( getAxisOffset( axisNo ) + offset );
 
     cout << __func__
@@ -177,13 +168,11 @@ void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32
 	 << " from register " << regAddr
 	 << " for axis " << axisNo
 	 << endl;
-#endif
 }
 
 uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
 {
     return axisNo * motorAxRegSize + motorRegOffset;
-    //return axisNo * MOTOR_AX_REG_RANGE + MOTOR_BASE_ADDR;
 }
 
 //====================================================================
@@ -200,8 +189,6 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
     : asynMotorAxis(pC, axisNo),
       pC_(pC),
       axisNo_(axisNo)
-      //axisBaseAddr( regBaseAddress + motorRegOffset + axisNo * motorAxRegSize )
-      //axisBaseAddr( ZYNQ_BASE_ADDR + MOTOR_BASE_ADDR + axisNo * MOTOR_AX_REG_RANGE )
 {
     cout << "============================================" << endl;
     cout << __func__
@@ -210,14 +197,10 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
 
     setMicrostep( 0 );
     setStepRate( 42950 );
-    //setStepRate( 0x80000000 );
     setResolution( 400 );
     
     // Enable the axis
     pC_->writeReg32( axisNo_, motorRegControl, 0x6 );
-    
-
-    //setPosition( 0 );
 
     cout << __func__
 	 << ": axis " << axisNo_
@@ -273,27 +256,9 @@ asynStatus zynqMotorAxis::sendAccelAndVelocity( uint32_t acceleration, uint32_t 
 {
     cout << __func__ << ": axis " << axisNo_ << endl;
 
-    //asynStatus status;
-    //int ival;
-    // static const char *functionName = "zynq::sendAccelAndVelocity";
-  
-    // Send the velocity
-    //ival = NINT( fabs(115200./velocity) );
-    //if (ival < 2) ival=2;
-    //if (ival > 255) ival = 255;
     cout << "velocity is " << velocity << endl;;
     pC_->writeReg32( axisNo_, motorRegSpeed, velocity );
       
-    // Send the acceleration
-    // acceleration is in steps/sec/sec
-    // MCB is programmed with Ramp Index (R) where:
-    //   dval (steps/sec/sec) = 720,000/(256-R) */
-    //   or R=256-(720,000/dval) */
-    //ival = NINT(256-(720000./acceleration));
-    //if (ival < 1) ival=1;
-    //if (ival > 255) ival=255;
-    //sprintf(pC_->outString_, "#%02dR=%d", axisNo_, ival);
-    //status = pC_->writeReadController();
     cout << "acceleration is " << acceleration << endl;
 
     return asynSuccess;
@@ -358,13 +323,6 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
 
     epicsStatus status;
 
-    //asynPrint(pasynUser_, ASYN_TRACE_FLOW,
-    //  "%s: minVelocity=%f, maxVelocity=%f, acceleration=%f\n",
-    //  __func__, minVelocity, maxVelocity, acceleration);
-    
-    //uint32_t maxVelocityRaw  = maxVelocity * resolutionCntPerEGU;
-    //uint32_t accelerationRaw = acceleration * resolutionCntPerEGU;
-
     status = sendAccelAndVelocity( NINT(acceleration), NINT(maxVelocity) );
 
     pC_->writeReg32( axisNo_, motorRegDirection,  (maxVelocity>0)?0:1 );
@@ -422,12 +380,6 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   //asynStatus comStatus;
   epicsUInt32 motorStatus;
 
-  //// Read motor speed
-  //uint32_t speed;
-  //pC_->readReg32( axisNo_, motorRegSpeed, &speed );
-  //cout << "set status: velocity = " << speed << endl;
-  ////setIntegerParam( pC_->motorVelocity_, speed );
-
   // Read the steps left to go
   uint32_t left;
   pC_->readReg32( axisNo_, motorRegDistanceRB, &left );
@@ -436,7 +388,6 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   cout << "positionSP = " << positionSP << endl;
   cout << "direction = " << direction << endl;
   cout << "positionRB = " << positionRB << endl;
-  cout << "set status: position = " << positionRB << endl;
   setDoubleParam(pC_->motorPosition_, positionRB);
 
   // Read the moving status of this motor
@@ -453,11 +404,8 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   {
       *moving = false;
       cout << __func__ << ": axis " << axisNo_ << " not moving" << endl;
-      //positionSP = positionRB;
   }
-  cout << "set status: done = " << ( *moving ? 0 : 1 ) << endl;
   setIntegerParam( pC_->motorStatusDone_, *moving ? 0 : 1 );
-  cout << "set status: moving = " << ( *moving ? 1 : 0 ) << endl;
   setIntegerParam( pC_->motorStatusMoving_, *moving ? 1 : 0 );
 
   // Read the limit status

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <macros>
+    <Dev></Dev>
+    <Sys>Det</Sys>
+  </macros>
+  <width>912</width>
+  <height>120</height>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display</name>
+    <macros>
+      <Mtr>{Mtr-Ax:X}</Mtr>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <width>912</width>
+    <height>60</height>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display_1</name>
+    <macros>
+      <Mtr>{Mtr-Ax:Y}</Mtr>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <y>60</y>
+    <width>912</width>
+    <height>60</height>
+  </widget>
+</display>

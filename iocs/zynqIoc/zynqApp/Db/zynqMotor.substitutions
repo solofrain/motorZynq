@@ -5,3 +5,12 @@ pattern
 {"$(Sys)",  "{$(Dev)-Ax:X}",  "asynMotor",  "$(Port)",  0,     "X",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
 {"$(Sys)",  "{$(Dev)-Ax:Y}",  "asynMotor",  "$(Port)",  1,     "Y",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
 }
+
+
+#file "db/motor.db"
+#{
+#pattern
+#{P,     M,       MOTOR,  PORT,   ADDR,  DESC,      DTYP,        MRES,   EGU,  PREC,  ALIAS }
+#{"Det", "Mtr:1", "M0",   "ZMTR", 0,     "motor 1", "ZynqMotor", 0.0025, "mm", 4,     "X"   }
+#{"Det", "Mtr:2", "M0",   "ZMTR", 0,     "motor 2", "ZynqMotor", 0.0025, "mm", 4,     "Y"   }
+#}
