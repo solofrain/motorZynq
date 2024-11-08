@@ -1,0 +1,7 @@
+file "db/asyn_motor.db"
+{
+pattern
+{P,         M,                DTYP,         PORT,       ADDR,  DESC, EGU, DIR,  VELO,  VBAS,  ACCL,  BDST,  BVEL,  BACC,  MRES,    PREC,  DHLM,  DLLM,  INIT}
+{"$(Sys)",  "{$(Dev)-Ax:X}",  "asynMotor",  "$(Port)",  0,     "X",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+{"$(Sys)",  "{$(Dev)-Ax:Y}",  "asynMotor",  "$(Port)",  1,     "Y",  mm,  Pos,  1,     .1,    .2,    0,     1,     .2,    0.0025,  4,     100,   -100,  ""}
+}
