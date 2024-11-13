@@ -284,7 +284,9 @@ asynStatus zynqMotorAxis::move( double position,
     int32_t moveDistance;
     asynStatus status;
 
-    status = sendAccelAndVelocity( NINT(acceleration), NINT(maxVelocity) );
+    double velocity = 42.95 * maxVelocity;
+
+    status = sendAccelAndVelocity( NINT(acceleration), NINT(velocity) );
     
     cout << "Current position = " << positionRB << endl;
     if ( relative ) // relative move
@@ -323,6 +325,7 @@ asynStatus zynqMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
 
     epicsStatus status;
 
+    double velocity = maxVelocity * 42.95;
     status = sendAccelAndVelocity( NINT(acceleration), NINT(maxVelocity) );
 
     pC_->writeReg32( axisNo_, motorRegDirection,  (maxVelocity>0)?0:1 );
