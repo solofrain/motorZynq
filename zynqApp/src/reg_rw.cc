@@ -14,21 +14,21 @@ class Reg
 
 private:
     std::unique_ptr<axi_reg>  reg_p;
-	const uintptr_t regBaseAddress = 0x43C00000;
-	uint32_t getAxisOffset(uint32_t axis);
+        const uintptr_t regBaseAddress = 0x43C00000;
+        uint32_t getAxisOffset(uint32_t axis);
 };
 
 
 int main( int argc, char *argv[] )
 {
     if (argc < 3)
-	{
-       printf("Usage: %s [R W] addr value\n",argv[0]);
+    {
+       cout << "Usage: " << argv[0] << " [R W] addr value" << endl;
        exit(1);
     }
 
     std::unique_ptr<axi_reg>  reg_p;
-	const uintptr_t regBaseAddress = 0x43C00000;
+    const uintptr_t regBaseAddress = 0x43C00000;
 
     try
     {
@@ -40,25 +40,17 @@ int main( int argc, char *argv[] )
     }
 
     uint32_t addr = strtol(argv[2],NULL,0); 
-    cout << "Register @" << addr << " (original) / ";
-
-    cout << addr << "(converted)";
-
-	uint32_t val;
+    uint32_t val;
     
-	if (strcmp(argv[1],"W") == 0)
-	{
-		cout << "written." << endl;
+    if (strcmp(argv[1],"W") == 0)
+    {
+        cout << "Write to reigster 0x" << addr << endl;
         val = strtoul(argv[3],NULL,0);
-		reg_p->reg_wr( addr, val );
-
-        cout << "New value = " << val << endl;
+        reg_p->reg_wr( addr, val );
     }
     else if (strcmp(argv[1], "R") == 0)
-	{
-		cout << "read." << endl;
-		val = reg_p->reg_rd( addr );
-
-        cout << " has value " << val << endl;
+    {
+        cout << "Read from register 0x" << addr << endl;
+        val = reg_p->reg_rd( addr );
     }
 }

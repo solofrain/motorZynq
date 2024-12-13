@@ -276,7 +276,7 @@ asynStatus zynqMotorAxis::move( double position,
 	 << ": axis " << axisNo_
 	 << " move to position " << position
 	 << ( relative ? " (relative) " : " (absolute) " )
-         << ", v_min = " << minVelocity
+     << ", v_min = " << minVelocity
 	 << ", v_max = " << maxVelocity
 	 << ", acceleration = " << acceleration
 	 << endl;
@@ -292,17 +292,18 @@ asynStatus zynqMotorAxis::move( double position,
     if ( relative ) // relative move
     {
         positionSP    = positionRB + NINT(position);
-	moveDistance  = NINT(position);
+	    moveDistance  = NINT(position);
     }
     else
     {
-	moveDistance = NINT(position - positionRB);
+	    moveDistance = NINT(position - positionRB);
         positionSP   = NINT(position);
     }
     cout << "New position = " << positionSP << endl;
     cout << "moveDistance = " << moveDistance << endl;
 
     direction       = (moveDistance<0) ? -1 : 1;
+	moveDistance = moveDistance * direction;
     
     cout << "Move " << moveDistance << " counts to " << positionSP << endl;
 
@@ -371,10 +372,10 @@ asynStatus zynqMotorAxis::setPosition(double position)
   * \param[out] moving A flag that is set indicating that the axis is moving (true) or done (false). */
 asynStatus zynqMotorAxis::poll(bool *moving)
 {
-  cout << "============================================" << endl;
-  cout << __func__
-       << ": axis " << axisNo_
-       << endl;
+  //cout << "============================================" << endl;
+  //cout << __func__
+  //     << ": axis " << axisNo_
+  //     << endl;
 
   //int done;
   //int driveOn;
@@ -387,26 +388,26 @@ asynStatus zynqMotorAxis::poll(bool *moving)
   uint32_t left;
   pC_->readReg32( axisNo_, motorRegDistanceRB, &left );
   positionRB = positionSP - direction * left;
-  cout << "Steps left (motorRegDistanceRB) = " << left << endl;
-  cout << "positionSP = " << positionSP << endl;
-  cout << "direction = " << direction << endl;
-  cout << "positionRB = " << positionRB << endl;
+  //cout << "Steps left (motorRegDistanceRB) = " << left << endl;
+  //cout << "positionSP = " << positionSP << endl;
+  //cout << "direction = " << direction << endl;
+  //cout << "positionRB = " << positionRB << endl;
   setDoubleParam(pC_->motorPosition_, positionRB);
 
   // Read the moving status of this motor
   pC_->readReg32( axisNo_, motorRegStatus, &motorStatus );
-  cout << "Ax " << axisNo_
-       << " status = " << motorStatus
-       << endl;
+  //cout << "Ax " << axisNo_
+  //     << " status = " << motorStatus
+  //     << endl;
   if ( motorStatus & MOTOR_STATUS_MASK_MOVING )
   {
       *moving = true;
-      cout << __func__ << ": axis " << axisNo_ << " moving" << endl;
+  //    cout << __func__ << ": axis " << axisNo_ << " moving" << endl;
   }
   else
   {
       *moving = false;
-      cout << __func__ << ": axis " << axisNo_ << " not moving" << endl;
+  //    cout << __func__ << ": axis " << axisNo_ << " not moving" << endl;
   }
   setIntegerParam( pC_->motorStatusDone_, *moving ? 0 : 1 );
   setIntegerParam( pC_->motorStatusMoving_, *moving ? 1 : 0 );

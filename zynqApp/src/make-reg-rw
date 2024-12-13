@@ -1,0 +1,18 @@
+#!/bin/bash
+
+FILES=(
+    "/epics/synApps/synApps_6_3/support/motor-R7-3-1/modules/motorZynq/zynqApp/src/reg_rw.cc"
+    "/epics/synApps/synApps_6_3/support/motor-R7-3-1/modules/motorZynq/zynqApp/src/spinlock.cc"
+    "/epics/synApps/synApps_6_3/support/motor-R7-3-1/modules/motorZynq/zynqApp/src/axi_reg.cc"
+        )
+
+while true; do
+    inotifywait -e modify "${FILES[@]}"
+
+    clear; g++ reg_rw.cc axi_reg.cc spinlock.cc -o reg_rw
+
+    build_date=$(date)
+    echo "Last built $build_date"
+
+done
+
