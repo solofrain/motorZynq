@@ -149,10 +149,10 @@ void zynqMotorController::writeReg32( int axisNo, uint32_t offset, uint32_t valu
     print_func;
     uint32_t regAddr = getAxisOffset( axisNo ) + offset;
     cout << __func__
-	 << ": write " << value
-	 << " to register " << regAddr 
-	 << " for axis " << axisNo
-	 << endl;
+         << ": write " << value
+         << " to register " << regAddr 
+         << " for axis " << axisNo
+         << endl;
     reg_p->reg_wr( getAxisOffset(axisNo) + offset, value );
 }
 
@@ -164,10 +164,10 @@ void zynqMotorController::readReg32( int axisNo, epicsUInt32 offset, epicsUInt32
     *value = reg_p->reg_rd( getAxisOffset( axisNo ) + offset );
 
     cout << __func__
-	 << ": read " << *value
-	 << " from register " << regAddr
-	 << " for axis " << axisNo
-	 << endl;
+         << ": read " << *value
+         << " from register " << regAddr
+         << " for axis " << axisNo
+         << endl;
 }
 
 uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
@@ -203,9 +203,9 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
     pC_->writeReg32( axisNo_, motorRegControl, 0x6 );
 
     cout << __func__
-	 << ": axis " << axisNo_
-	 << " initial position at " << positionSP
-	 << endl;
+         << ": axis " << axisNo_
+         << " initial position at " << positionSP
+         << endl;
 }
     
 asynStatus zynqMotorAxis::setResolution( uint32_t resolution )
@@ -235,8 +235,8 @@ void zynqMotorAxis::report(FILE *fp, int level)
 asynStatus zynqMotorAxis::setMicrostep( uint32_t microstep )
 {
     cout << __func__
-	 << ": set microstep = " << microstep
-	 << endl;
+     << ": set microstep = " << microstep
+     << endl;
     pC_->writeReg32( axisNo_, motorRegMicrostep, microstep );
 
     return asynSuccess;
@@ -245,8 +245,8 @@ asynStatus zynqMotorAxis::setMicrostep( uint32_t microstep )
 asynStatus zynqMotorAxis::setStepRate( uint32_t stepRate )
 {
     cout << __func__
-	 << ": set step rate = " << stepRate
-	 << endl;
+     << ": set step rate = " << stepRate
+     << endl;
     pC_->writeReg32( axisNo_, motorRegSpeed, stepRate );
 
     return asynSuccess;
@@ -273,13 +273,13 @@ asynStatus zynqMotorAxis::move( double position,
 {
     cout << "============================================" << endl;
     cout << __func__
-	 << ": axis " << axisNo_
-	 << " move to position " << position
-	 << ( relative ? " (relative) " : " (absolute) " )
+     << ": axis " << axisNo_
+     << " move to position " << position
+     << ( relative ? " (relative) " : " (absolute) " )
      << ", v_min = " << minVelocity
-	 << ", v_max = " << maxVelocity
-	 << ", acceleration = " << acceleration
-	 << endl;
+     << ", v_max = " << maxVelocity
+     << ", acceleration = " << acceleration
+     << endl;
 
     int32_t moveDistance;
     asynStatus status;
@@ -292,18 +292,18 @@ asynStatus zynqMotorAxis::move( double position,
     if ( relative ) // relative move
     {
         positionSP    = positionRB + NINT(position);
-	    moveDistance  = NINT(position);
+        moveDistance  = NINT(position);
     }
     else
     {
-	    moveDistance = NINT(position - positionRB);
+        moveDistance = NINT(position - positionRB);
         positionSP   = NINT(position);
     }
     cout << "New position = " << positionSP << endl;
     cout << "moveDistance = " << moveDistance << endl;
 
     direction       = (moveDistance<0) ? -1 : 1;
-	moveDistance = moveDistance * direction;
+    moveDistance = moveDistance * direction;
     
     cout << "Move " << moveDistance << " counts to " << positionSP << endl;
 
@@ -313,8 +313,8 @@ asynStatus zynqMotorAxis::move( double position,
     pC_->writeReg32( axisNo_, motorRegEnable,    0);
 
     cout << __func__
-	 << ": motor " << axisNo_
-	 << " commanded to move to destination." << endl;
+     << ": motor " << axisNo_
+     << " commanded to move to destination." << endl;
     return status;
 }
 
@@ -340,7 +340,7 @@ asynStatus zynqMotorAxis::stop(double acceleration )
 {
     cout << __func__
          << ": stopping axis " << axisNo_
-	 << endl;
+         << endl;
 
     pC_->writeReg32( axisNo_, motorRegControl, MOTOR_CONTROL_MASK_STOP  |
                                                MOTOR_CONTROL_MASK_RESET |
@@ -356,9 +356,9 @@ asynStatus zynqMotorAxis::setPosition(double position)
     positionRB = positionSP;
 
     cout << __func__
-	 << ": set axis " << axisNo_
-	 << " position to " << positionSP
-	 << endl;
+         << ": set axis " << axisNo_
+         << " position to " << positionSP
+         << endl;
 
     return asynSuccess;
 }
