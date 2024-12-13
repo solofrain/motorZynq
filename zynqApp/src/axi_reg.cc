@@ -34,7 +34,7 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
                                           reg(nullptr),
                                           reg_size(0x10000)
 {
-    cout << __func__ << ": constructing axi_reg object..." << endl;
+    //cout << __func__ << ": constructing axi_reg object..." << endl;
 
     int fd = open("/dev/mem",O_RDWR | O_SYNC);
     if (fd == -1)
@@ -65,7 +65,7 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
         throw std::runtime_error("Memory mapping failed");
     }
 
-    cout << __func__ << ": axi_reg object created at 0x" << static_cast<void*>(reg) << endl;
+    //cout << __func__ << ": axi_reg object created at 0x" << static_cast<void*>(reg) << endl;
 }
 
 
@@ -77,7 +77,7 @@ axi_reg::~axi_reg()
 	{
 	    munmap(reg, reg_size);
     }
-    cout << __func__ << ": axi_reg object destructed." << endl;
+    //cout << __func__ << ": axi_reg object destructed." << endl;
 }
 
 
