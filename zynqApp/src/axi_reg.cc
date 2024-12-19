@@ -22,6 +22,7 @@
 #include <thread>
 
 #include "axi_reg.h"
+#include "log.h"
 
 
 using std::cin;
@@ -34,8 +35,6 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
                                           reg(nullptr),
                                           reg_size(0x10000)
 {
-    //cout << __func__ << ": constructing axi_reg object..." << endl;
-
     int fd = open("/dev/mem",O_RDWR | O_SYNC);
     if (fd == -1)
     {
@@ -65,7 +64,10 @@ axi_reg::axi_reg(uint32_t axi_base_addr): axi_base_addr(axi_base_addr),
         throw std::runtime_error("Memory mapping failed");
     }
 
-    //cout << __func__ << ": axi_reg object created at 0x" << static_cast<void*>(reg) << endl;
+    trace_reg( __func__,
+               ": axi_reg object created at 0x",
+               std::hex, static_cast<void*>(reg), std::dec
+             );
 }
 
 
@@ -77,7 +79,7 @@ axi_reg::~axi_reg()
     {
         munmap(reg, reg_size);
     }
-    //cout << __func__ << ": axi_reg object destructed." << endl;
+    trace_reg( __func__, ": axi_reg object destructed." );
 }
 
 
@@ -85,10 +87,6 @@ axi_reg::~axi_reg()
 //=========================================
 uint32_t axi_reg::reg_rd(size_t offset)
 {
-//    cout << __func__ << std::hex
-//         << ": input offset = 0x" << offset
-//         << endl;
-
     uint32_t val;
     if (offset % sizeof(uint32_t) != 0)
     {
@@ -101,11 +99,13 @@ uint32_t axi_reg::reg_rd(size_t offset)
     reg_lock.unlock();
 
 
-    //cout << __func__ << std::hex
-    //     << ": read 0x" << val
-    //     << " @ 0x" << offset
-    //     << " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr)) << ")"
-    //     << endl;
+    trace_reg( __func__, ": read 0x",
+               std::hex, val,
+               " @ 0x", offset,
+               " (0x",
+               static_cast<void*>(const_cast<uint32_t*>(registerPtr)),
+               std::dec
+             );
 
     //io_wait();
     return val;
@@ -116,11 +116,6 @@ uint32_t axi_reg::reg_rd(size_t offset)
 //=========================================
 void axi_reg::reg_wr(size_t offset, uint32_t value)
 {
-    //cout << __func__ << std::hex
-    //     << ": input offset = 0x" << offset
-    //     << ", wr_data = 0x" << value
-    //     << endl;
-
     if (offset % sizeof(uint32_t) != 0) {
         throw std::runtime_error("Offset must be aligned to register size");
     }
@@ -131,11 +126,13 @@ void axi_reg::reg_wr(size_t offset, uint32_t value)
     reg_lock.unlock();
 
 
-    //cout << __func__ << std::hex
-    //     << ": write 0x" << value
-    //     << " to 0x" << offset
-    //     << " (0x" << static_cast<void*>(const_cast<uint32_t*>(registerPtr)) << ")"
-    //     << endl;
+    trace_reg( __func__,
+               ": write 0x", std::hex, value,
+               " to 0x", offset,
+               " (0x",
+               static_cast<void*>(const_cast<uint32_t*>(registerPtr)),
+               std::dec
+             );
 
     reg_rd(offset);
 }
