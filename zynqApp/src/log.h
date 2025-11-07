@@ -50,6 +50,9 @@ void trace_poll( Ts&&... ts )
 }
 
 
-inline auto cout_hex = [](int a) {
-    return std::hex << a << std::dec;
+inline auto cout_hex = [](int a)
+{
+    std::ostringstream oss;
+    oss << std::hex << a << std::dec;
+    return oss.str();
 };
