@@ -38,6 +38,8 @@ private:
     zynqMotorController *pC_;   // Pointer to the asynMotorController to which this axis belongs.
     int axisNo_;
 
+    int ustepParam_;
+
     static const uintptr_t motorRegControl    = 0x00; // {28'x0, stop, rst_n, sleep_n, en_n}
     static const uintptr_t motorRegMicrostep  = 0x04; // microstep
     static const uintptr_t motorRegDirection  = 0x08;

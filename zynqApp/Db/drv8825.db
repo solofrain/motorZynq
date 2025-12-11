@@ -1,0 +1,29 @@
+# DRV8825 microstep. See datasheet for definition.
+record(mbbo, "$(P)$(M):USTEP") {
+    field(DESC, "Microstep")
+    field(DTYP, "asynUInt32Digital")
+    field(OUT,  "@asynMask($(PORT) $(ADDR) 0x7) USTEP")
+    field(ZRVL, "0")  field(ZRST, "Full step")
+    field(ONVL, "1")  field(ONST, "1/2 step")
+    field(TWVL, "2")  field(TWST, "1/4 step")
+    field(THVL, "3")  field(THST, "1/8 step")
+    field(FRVL, "4")  field(FRST, "1/16 step")
+    field(FVVL, "5")  field(FVST, "1/32 step")
+    field(SXVL, "6")  field(SXST, "1/32 step")
+    field(SVVL, "7")  field(SVST, "1/32 step")
+}
+
+record(mbbo, "$(P)$(M):USTEP_RBV") {
+    field(DESC, "Microstep")
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(PORT) $(ADDR) 0x7) USTEP")
+    field(ZRVL, "0")  field(ZRST, "Full step")
+    field(ONVL, "1")  field(ONST, "1/2 step")
+    field(TWVL, "2")  field(TWST, "1/4 step")
+    field(THVL, "3")  field(THST, "1/8 step")
+    field(FRVL, "4")  field(FRST, "1/16 step")
+    field(FVVL, "5")  field(FVST, "1/32 step")
+    field(SXVL, "6")  field(SXST, "1/32 step")
+    field(SVVL, "7")  field(SVST, "1/32 step")
+}
+

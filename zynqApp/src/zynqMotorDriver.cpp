@@ -53,6 +53,8 @@ zynqMotorController::zynqMotorController( const char *portName,
 {
     cout << __func__ << ": creating zynqMotorController object..." << endl;
 
+    createParam( "USTEP", asynParamUInt32Digital, &ustepParam_ );
+
     zynqMotorAxis* pAxis;
 
 #ifndef DBG
@@ -176,6 +178,39 @@ uint32_t zynqMotorController::getAxisOffset(uint32_t axisNo)
 {
     return axisNo * motorAxRegSize + motorRegOffset;
 }
+
+asynStatus zynqMotorController::writeUInt32Digital( asynUser    *pasynUser
+                                                  , epicsUInt32  value
+                                                  , epicsUInt32  mask
+                                                  )
+{
+    int function = pasynUser->reason;
+    int axisNo = 0;
+    getAddress(pasynUser, &axisNo);
+
+    if (function == ustepParam_)
+    {
+        epicsUInt32 ustepBits = value & mask;   // 3 bits if you use 0x7 in DB
+
+        zynqMotorAxis *pAxis = static_cast<zynqMotorAxis*>(getAxis(axisNo));
+
+        if ( !pAxis )
+        {
+            return asynError;
+        }
+
+        asynStatus status = pAxis->setMicrostep( ustepBits );
+        if ( status == asynSuccess )
+        {
+            setUIntDigitalParam( axisNo, ustepParam_, ustepBits, mask );
+            callParamCallbacks( axisNo );
+        }
+        return status;
+    }
+
+    return asynMotorController::writeUInt32Digital( pasynUser, value, mask );
+}
+
 
 //====================================================================
 
