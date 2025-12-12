@@ -1,0 +1,53 @@
+#====================================================================
+# DRV8434A microstep. See datasheet for definition.
+# Refer to the circuit configuratino for details.
+#
+#      M0  |      M1     | Microstep |        Step Mode
+#    -------------------------------------------------------
+#       0  |       0     |     0     | Full step (100% current)
+#       0  | 330K to GND |     1     | Full step (71% current)
+#       1  |       0     |     2     |  Non-circular 1/2 step
+#     Hi-Z |       0     |     3     |         1/2 step
+#       0  |       1     |     4     |         1/4 step
+#       1  |       1     |     5     |         1/8 step
+#     Hi-Z |       1     |     6     |        1/16 step
+#       0  |     Hi-Z    |     7     |        1/32 step
+#     Hi-Z | 330K to GND |     8     |        1/64 step
+#     Hi-Z |     Hi-Z    |     9     |       1/128 step
+#       1  |     Hi-Z    |    10     |       1/256 step
+#
+#--------------------------------------------------------------------
+record(mbbo, "$(P)$(M):USTEP") {
+    field(DESC, "Microstep")
+    field(DTYP, "asynUInt32Digital")
+    field(OUT,  "@asynMask($(PORT) $(ADDR) 0x7) USTEP")
+    field(ZRVL, "0")  field(ZRST, "Full step (100% current)")
+    field(ONVL, "1")  field(ONST, "Full step (71% current)")
+    field(TWVL, "2")  field(TWST, "Non-circular 1/2 step")
+    field(THVL, "3")  field(THST, "1/2 step")
+    field(FRVL, "4")  field(FRST, "1/4 step")
+    field(FVVL, "5")  field(FVST, "1/8 step")
+    field(SXVL, "6")  field(SXST, "1/16 step")
+    field(SVVL, "7")  field(SVST, "1/32 step")
+    field(EIVL, "8")  field(EIST, "1/64 step")
+    field(NIVL, "9")  field(NIST, "1/128 step")
+    field(TEVL, "10")  field(TEST, "1/256 step")
+}
+
+record(mbbo, "$(P)$(M):USTEP_RBV") {
+    field(DESC, "Microstep")
+    field(DTYP, "asynUInt32Digital")
+    field(INP,  "@asynMask($(PORT) $(ADDR) 0x7) USTEP")
+    field(ZRVL, "0")  field(ZRST, "Full step (100% current)")
+    field(ONVL, "1")  field(ONST, "Full step (71% current)")
+    field(TWVL, "2")  field(TWST, "Non-circular 1/2 step")
+    field(THVL, "3")  field(THST, "1/2 step")
+    field(FRVL, "4")  field(FRST, "1/4 step")
+    field(FVVL, "5")  field(FVST, "1/8 step")
+    field(SXVL, "6")  field(SXST, "1/16 step")
+    field(SVVL, "7")  field(SVST, "1/32 step")
+    field(EIVL, "8")  field(EIST, "1/64 step")
+    field(NIVL, "9")  field(NIST, "1/128 step")
+    field(TEVL, "10")  field(TEST, "1/256 step")
+}
+#====================================================================

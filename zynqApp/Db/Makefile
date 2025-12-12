@@ -5,6 +5,7 @@ include $(TOP)/configure/CONFIG
 
 #----------------------------------------------------
 DB += drv8825.db
+DB += drv8434a.db
 
 #----------------------------------------------------
 # If <anyname>.db template is not named <anyname>*.template add
