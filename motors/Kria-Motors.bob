@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>KRIA Motors</name>
+  <width>900</width>
+  <height>280</height>
+  <background_color>
+    <color red="240" green="240" blue="240">
+    </color>
+  </background_color>
+  <widget type="label" version="2.0.0">
+    <name>Title</name>
+    <text>$(TITLE)</text>
+    <x>30</x>
+    <y>10</y>
+    <width>815</width>
+    <height>30</height>
+    <font>
+      <font family="Liberation Sans" style="BOLD" size="18.0">
+      </font>
+    </font>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>KR260</name>
+    <macros>
+      <Sys>Det</Sys>
+      <Mtr>Mtr</Mtr>
+      <CntlSys>Det-CT</CntlSys>
+      <CntlDev>MDrive:$(CntlDevNum)</CntlDev>
+      <Dev>{MDrive-$(Ax)}</Dev>
+      <CntlAxis>1</CntlAxis>
+    </macros>
+    <x>15</x>
+    <y>55</y>
+    <width>855</width>
+    <height>206</height>
+    <style>1</style>
+    <font>
+      <font family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="Grid" red="128" green="128" blue="128">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color red="0" green="0" blue="255">
+      </color>
+    </line_color>
+    <background_color>
+      <color name="Read_Background" red="240" green="240" blue="240">
+      </color>
+    </background_color>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display_1</name>
+    <macros>
+      <Ax>1</Ax>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <x>30</x>
+    <y>90</y>
+    <width>830</width>
+    <height>40</height>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display_2</name>
+    <macros>
+      <Ax>2</Ax>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <x>30</x>
+    <y>130</y>
+    <width>830</width>
+    <height>40</height>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display_3</name>
+    <macros>
+      <Ax>3</Ax>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <x>30</x>
+    <y>170</y>
+    <width>830</width>
+    <height>40</height>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Embedded Display_4</name>
+    <macros>
+      <Ax>4</Ax>
+    </macros>
+    <file>zynq-motor-1x.bob</file>
+    <x>30</x>
+    <y>210</y>
+    <width>830</width>
+    <height>40</height>
+  </widget>
+</display>

@@ -1,0 +1,9 @@
+file "db/basic_asyn_motor.db"
+{
+pattern
+{P,      N, M,               DTYP,        PORT,  ADDR, DESC,       EGU,  DHLM, DLLM, DIR, VMAX, VELO, VBAS, ACCL, BDST, BVEL, BACC, MRES,  RRES,  PREC, INIT}
+{"Det",  1, "{Sample-Ax:1}", "asynMotor", ZYNQ1, 0,    "Motor 0",  rev,  0,    0,    Pos, 1.0,  0.5,  0.1,  0.5,  0,    1,    0.5,  0.005, 0.005, 3,    ""}
+{"Det",  2, "{Sample-Ax:2}", "asynMotor", ZYNQ1, 1,    "Motor 1",  rev,  0,    0,    Pos, 1.0,  0.5,  0.1,  0.5,  0,    1,    0.5,  0.005, 0.005, 3,    ""}
+{"Det",  3, "{Sample-Ax:3}", "asynMotor", ZYNQ1, 2,    "Motor 2",  rev,  0,    0,    Pos, 1.0,  0.5,  0.1,  0.5,  0,    1,    0.5,  0.005, 0.005, 3,    ""}
+{"Det",  4, "{Sample-Ax:4}", "asynMotor", ZYNQ1, 3,    "Motor 3",  rev,  0,    0,    Pos, 1.0,  0.5,  0.1,  0.5,  0,    1,    0.5,  0.005, 0.005, 3,    ""}
+}

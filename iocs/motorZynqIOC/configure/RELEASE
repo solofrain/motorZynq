@@ -1,0 +1,18 @@
+# RELEASE - Paths to external support modules
+
+SUPPORT=/epics/support
+EPICS_BASE=/epics/base
+
+MOTOR=$(SUPPORT)/motor-R7-2-2
+ASYN=$(SUPPORT)/asyn-R4-42
+AUTOSAVE=$(SUPPORT)/autosave-R5-10-2
+BUSY=$(SUPPORT)/busy-R1-7-3
+SSCAN=$(SUPPORT)/sscan-R2-11-5
+CALC=$(SUPPORT)/calc-R3-7-4
+#SNCSEQ=$(SUPPORT)/sequencer-mirror-R2-2-9
+
+# motorZynq support module
+MOTORZYNQ=$(MOTOR)/modules/motorZynq
+
+-include $(TOP)/configure/RELEASE.local
+-include $(TOP)/configure/RELEASE.$(EPICS_HOST_ARCH).local

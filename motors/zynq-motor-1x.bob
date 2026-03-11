@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>MDrive Motors</name>
+  <macros>
+    <Motor>$(Sys){$(Dev)-Ax:$(Ax)}$(Mtr)</Motor>
+  </macros>
+  <width>857</width>
+  <height>266</height>
+  <background_color>
+    <color red="240" green="240" blue="240">
+    </color>
+  </background_color>
+  <widget type="group" version="3.0.0">
+    <name>axis1_4</name>
+    <macros>
+      <CntlDevNum>1</CntlDevNum>
+    </macros>
+    <x>5</x>
+    <y>5</y>
+    <width>815</width>
+    <height>26</height>
+    <style>2</style>
+    <foreground_color>
+      <color red="128" green="128" blue="128">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color red="128" green="128" blue="128">
+      </color>
+    </line_color>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <widget type="led" version="2.0.0">
+      <name>Motor Moving_4</name>
+      <pv_name>$(Motor).MOVN</pv_name>
+      <x>207</x>
+      <y>2</y>
+      <width>16</width>
+      <square>true</square>
+    </widget>
+    <widget type="textentry" version="3.0.0">
+      <name>Position_4</name>
+      <pv_name>$(Motor).VAL</pv_name>
+      <x>225</x>
+      <y>2</y>
+      <width>115</width>
+      <horizontal_alignment>1</horizontal_alignment>
+    </widget>
+    <widget type="led" version="2.0.0">
+      <name>Negative Limit_4</name>
+      <pv_name>$(Motor).LLS</pv_name>
+      <x>344</x>
+      <y>2</y>
+      <width>16</width>
+      <off_color>
+        <color red="128" green="0" blue="0">
+        </color>
+      </off_color>
+      <on_color>
+        <color red="255" green="0" blue="0">
+        </color>
+      </on_color>
+      <square>true</square>
+    </widget>
+    <widget type="textupdate" version="2.0.0">
+      <name>Position RBV_4</name>
+      <pv_name>$(Motor).RBV</pv_name>
+      <x>360</x>
+      <y>2</y>
+      <width>115</width>
+      <horizontal_alignment>1</horizontal_alignment>
+      <vertical_alignment>1</vertical_alignment>
+    </widget>
+    <widget type="led" version="2.0.0">
+      <name>Positive Limit_4</name>
+      <pv_name>$(Motor).HLS</pv_name>
+      <x>477</x>
+      <y>2</y>
+      <width>16</width>
+      <off_color>
+        <color red="128" green="0" blue="0">
+        </color>
+      </off_color>
+      <on_color>
+        <color red="255" green="0" blue="0">
+        </color>
+      </on_color>
+      <square>true</square>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Tweak Reverse_4</name>
+      <actions>
+        <action type="write_pv">
+          <description>Tweak Reerse</description>
+          <pv_name>$(Motor).TWR</pv_name>
+          <value>1</value>
+        </action>
+      </actions>
+      <pv_name>$(Motor).TWR</pv_name>
+      <text>&lt;</text>
+      <x>497</x>
+      <y>2</y>
+      <width>24</width>
+      <height>20</height>
+    </widget>
+    <widget type="textentry" version="3.0.0">
+      <name>Tweak Value_4</name>
+      <pv_name>$(Motor).TWV</pv_name>
+      <x>521</x>
+      <y>2</y>
+      <width>115</width>
+      <horizontal_alignment>1</horizontal_alignment>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Tweak Forward_4</name>
+      <actions>
+        <action type="write_pv">
+          <description>Tweak Forward</description>
+          <pv_name>$(Motor).TWF</pv_name>
+          <value>1</value>
+        </action>
+      </actions>
+      <pv_name>$(Motor).TWF</pv_name>
+      <text>&gt;</text>
+      <x>636</x>
+      <y>2</y>
+      <width>24</width>
+      <height>20</height>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Stop Motor_4</name>
+      <actions execute_as_one="true">
+        <action type="write_pv">
+          <description>Write PV</description>
+          <pv_name>$(Motor).STOP</pv_name>
+          <value>1</value>
+        </action>
+        <action type="write_pv">
+          <description>Write PV</description>
+          <pv_name>$(Motor).STOP</pv_name>
+          <value>0</value>
+        </action>
+      </actions>
+      <text>Stop</text>
+      <x>665</x>
+      <y>2</y>
+      <width>70</width>
+      <height>20</height>
+      <foreground_color>
+        <color red="255" green="0" blue="0">
+        </color>
+      </foreground_color>
+      <tooltip>$(actions)</tooltip>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>More Options_4</name>
+      <actions>
+        <action type="open_display">
+          <description>Motor Config</description>
+          <file>zynq-motor-config.bob</file>
+          <macros>
+            <NAME>$(Motor)</NAME>
+            <Dev>{$(Dev)-Ax:$(Ax)}$(Mtr)</Dev>
+          </macros>
+          <target>tab</target>
+        </action>
+        <action type="open_display">
+          <description>Motor Detail</description>
+          <file>../../common/motor/mdriveDetail.bob</file>
+          <macros>
+            <NAME>$(Motor)</NAME>
+          </macros>
+          <target>tab</target>
+        </action>
+        <action type="open_display">
+          <description>Asyn</description>
+          <file>../../adl/asynRecord.bob</file>
+          <macros>
+            <P>$(CntlSys)</P>
+            <R>{$(CntlDev)}Asyn</R>
+            <NAME>$(Motor)</NAME>
+          </macros>
+          <target>tab</target>
+        </action>
+      </actions>
+      <text>More</text>
+      <x>740</x>
+      <y>2</y>
+      <width>70</width>
+      <height>20</height>
+      <font>
+        <font family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <tooltip>$(actions)</tooltip>
+    </widget>
+    <widget type="textupdate" version="2.0.0">
+      <name>Description_4</name>
+      <pv_name>$(Motor).DESC</pv_name>
+      <y>2</y>
+      <width>200</width>
+      <font>
+        <font family="Liberation Sans" style="BOLD" size="14.0">
+        </font>
+      </font>
+      <horizontal_alignment>1</horizontal_alignment>
+      <vertical_alignment>1</vertical_alignment>
+    </widget>
+  </widget>
+</display>

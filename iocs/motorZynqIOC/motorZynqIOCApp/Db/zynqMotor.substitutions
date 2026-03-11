@@ -1,0 +1,9 @@
+file "db/zynqMotor.template"
+{
+pattern
+{P,      M,                PORT,  ADDR}
+{"Det",  "{Sample-Ax:1}",  ZYNQ1, 0}
+{"Det",  "{Sample-Ax:2}",  ZYNQ1, 1}
+{"Det",  "{Sample-Ax:3}",  ZYNQ1, 2}
+{"Det",  "{Sample-Ax:4}",  ZYNQ1, 3}
+}

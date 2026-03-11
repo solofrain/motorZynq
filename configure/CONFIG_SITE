@@ -1,0 +1,3 @@
+# CONFIG_SITE - Site-specific build configuration
+# Set to YES to cross-compile for linux-aarch64 on x86_64 host
+#CROSS_COMPILER_TARGET_ARCHS = linux-aarch64

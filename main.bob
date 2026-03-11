@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>Detector Group Main</name>
+  <width>900</width>
+  <height>1100</height>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="rectangle" version="2.0.0">
+    <name>Rectangle</name>
+    <y>98</y>
+    <width>901</width>
+    <height>406</height>
+    <line_width>1</line_width>
+    <line_color>
+      <color name="Header_Background" red="77" green="77" blue="77">
+      </color>
+    </line_color>
+    <background_color>
+      <color name="Background" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+  </widget>
+  <widget type="picture" version="2.0.0">
+    <name>Image_1</name>
+    <file>../common/Images/NSLS2blue.png</file>
+    <x>306</x>
+    <width>595</width>
+    <height>98</height>
+    <stretch_image>true</stretch_image>
+    <actions>
+    </actions>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Text Update_8</name>
+    <text>Detector Group</text>
+    <x>534</x>
+    <width>378</width>
+    <height>100</height>
+    <font>
+      <font family="Sans" style="BOLD" size="25.742574257425744">
+      </font>
+    </font>
+    <foreground_color>
+      <color red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+    <wrap_words>false</wrap_words>
+    <actions>
+    </actions>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="picture" version="2.0.0">
+    <name>Image</name>
+    <file>../common/Images/NSLS2logo.png</file>
+    <width>523</width>
+    <height>98</height>
+    <stretch_image>true</stretch_image>
+    <actions>
+    </actions>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Motion</name>
+    <x>334</x>
+    <y>144</y>
+    <width>230</width>
+    <height>120</height>
+    <style>1</style>
+    <foreground_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color red="43" green="118" blue="255">
+      </color>
+    </line_color>
+    <actions>
+    </actions>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button_39</name>
+      <actions>
+        <action type="open_display">
+          <description>Open Display</description>
+          <file>motors/Kria-Motors.bob</file>
+          <macros>
+            <TITLE>Detector - KRIA Motors</TITLE>
+            <Sys>Det</Sys>
+            <Dev>Sample</Dev>
+            <Mtr></Mtr>
+          </macros>
+          <target>tab</target>
+        </action>
+      </actions>
+      <text>KRIA Motors</text>
+      <x>25</x>
+      <y>29</y>
+      <width>180</width>
+      <height>40</height>
+      <background_color>
+        <color red="240" green="240" blue="240">
+        </color>
+      </background_color>
+      <tooltip>$(actions)</tooltip>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+  </widget>
+</display>

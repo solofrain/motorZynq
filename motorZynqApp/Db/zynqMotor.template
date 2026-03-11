@@ -1,0 +1,154 @@
+# zynqMotor.template
+#
+# Custom PVs for KR260 DRV8434A motor parameters not covered
+# by the standard EPICS motor record.
+#
+# Macros:
+#   P     - PV prefix (e.g., "ZYNQ:")
+#   M     - Motor name (e.g., "m1")
+#   PORT  - Asyn port name
+#   ADDR  - Axis number (0-3)
+
+# -- Direction Polarity --
+record(bo, "$(P)$(M):DirPol") {
+    field(DESC, "Direction polarity")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_DIR_POL")
+    field(ZNAM, "Normal")
+    field(ONAM, "Reversed")
+    field(PINI, "YES")
+}
+
+record(bi, "$(P)$(M):DirPol_RBV") {
+    field(DESC, "Direction polarity readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_DIR_POL")
+    field(ZNAM, "Normal")
+    field(ONAM, "Reversed")
+    field(SCAN, "I/O Intr")
+}
+
+# -- Limit Switch Enable --
+record(bo, "$(P)$(M):LimitEn") {
+    field(DESC, "Limit switch enable")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_LIMIT_EN")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(PINI, "YES")
+}
+
+record(bi, "$(P)$(M):LimitEn_RBV") {
+    field(DESC, "Limit switch enable readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_LIMIT_EN")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SCAN, "I/O Intr")
+}
+
+# -- Limit Switch Polarity --
+record(bo, "$(P)$(M):LimitPol") {
+    field(DESC, "Limit switch polarity")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_LIMIT_POL")
+    field(ZNAM, "Normal")
+    field(ONAM, "Inverted")
+    field(PINI, "YES")
+}
+
+record(bi, "$(P)$(M):LimitPol_RBV") {
+    field(DESC, "Limit switch polarity readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_LIMIT_POL")
+    field(ZNAM, "Normal")
+    field(ONAM, "Inverted")
+    field(SCAN, "I/O Intr")
+}
+
+# -- Microstep Mode --
+record(mbbo, "$(P)$(M):UstepMode") {
+    field(DESC, "Microstep mode")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_USTEP_MODE")
+    field(ZRST, "Full step 100%")
+    field(ZRVL, "0")
+    field(ONST, "1/2 step")
+    field(ONVL, "1")
+    field(TWST, "1/4 step")
+    field(TWVL, "2")
+    field(THST, "1/8 step")
+    field(THVL, "3")
+    field(FRST, "1/16 step")
+    field(FRVL, "4")
+    field(FVST, "1/32 step")
+    field(FVVL, "5")
+    field(SXST, "1/128 step")
+    field(SXVL, "7")
+    field(SVST, "1/256 step")
+    field(SVVL, "8")
+    field(EIST, "NC 1/2 step")
+    field(EIVL, "17")
+    field(PINI, "YES")
+}
+
+record(mbbi, "$(P)$(M):UstepMode_RBV") {
+    field(DESC, "Microstep mode readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_USTEP_MODE")
+    field(ZRST, "Full step 100%")
+    field(ZRVL, "0")
+    field(ONST, "1/2 step")
+    field(ONVL, "1")
+    field(TWST, "1/4 step")
+    field(TWVL, "2")
+    field(THST, "1/8 step")
+    field(THVL, "3")
+    field(FRST, "1/16 step")
+    field(FRVL, "4")
+    field(FVST, "1/32 step")
+    field(FVVL, "5")
+    field(SXST, "1/128 step")
+    field(SXVL, "7")
+    field(SVST, "1/256 step")
+    field(SVVL, "8")
+    field(EIST, "NC 1/2 step")
+    field(EIVL, "17")
+    field(SCAN, "I/O Intr")
+}
+
+# -- Sleep Mode --
+record(bo, "$(P)$(M):Sleep") {
+    field(DESC, "Sleep mode")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_SLEEP")
+    field(ZNAM, "Awake")
+    field(ONAM, "Sleep")
+}
+
+record(bi, "$(P)$(M):Sleep_RBV") {
+    field(DESC, "Sleep mode readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_SLEEP")
+    field(ZNAM, "Awake")
+    field(ONAM, "Sleep")
+    field(SCAN, "I/O Intr")
+}
+
+# -- Reset --
+record(bo, "$(P)$(M):Reset") {
+    field(DESC, "Reset driver")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR))ZYNQ_RESET")
+    field(ZNAM, "Idle")
+    field(ONAM, "Reset")
+    field(HIGH, "0.01")
+}
+
+# -- Step Rate Readback --
+record(longin, "$(P)$(M):StepRate_RBV") {
+    field(DESC, "Raw step rate readback")
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_STEP_RATE")
+    field(SCAN, "I/O Intr")
+}

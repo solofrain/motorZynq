@@ -1,0 +1,18 @@
+# RELEASE - Location of external support modules
+#
+# Modify to match your site's configuration.
+# These paths will be overridden by make release when built as part of synApps.
+
+SUPPORT=/epics/support
+-include $(TOP)/configure/SUPPORT.$(EPICS_HOST_ARCH)
+
+EPICS_BASE=/epics/base
+-include $(TOP)/configure/EPICS_BASE
+-include $(TOP)/configure/EPICS_BASE.$(EPICS_HOST_ARCH)
+
+# If using the motor module from synApps:
+MOTOR=$(SUPPORT)/motor-R7-2-2
+ASYN=$(SUPPORT)/asyn-R4-42
+
+-include $(TOP)/configure/RELEASE.local
+-include $(TOP)/configure/RELEASE.$(EPICS_HOST_ARCH).local

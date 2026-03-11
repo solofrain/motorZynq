@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>Motor Control</name>
+  <width>525</width>
+  <height>1200</height>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="bool_button" version="2.0.0">
+    <name>Boolean Button</name>
+    <pv_name>$(Sys)$(Dev):Sleep</pv_name>
+    <x>18</x>
+    <y>10</y>
+    <width>118</width>
+    <height>22</height>
+    <off_label>Sleep</off_label>
+    <off_color>
+      <color name="On" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_label>Wakeup</on_label>
+    <on_color>
+      <color name="Off" red="60" green="100" blue="60">
+      </color>
+    </on_color>
+    <show_led>false</show_led>
+  </widget>
+  <widget type="led" version="2.0.0">
+    <name>LED</name>
+    <pv_name>$(Sys)$(Dev):Sleep_RBV</pv_name>
+    <x>156</x>
+    <y>10</y>
+    <off_label>Awake</off_label>
+    <off_color>
+      <color name="On" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_label>Sleeping</on_label>
+    <on_color>
+      <color name="Off" red="60" green="100" blue="60">
+      </color>
+    </on_color>
+    <square>true</square>
+  </widget>
+  <widget type="multi_state_led" version="2.0.0">
+    <name>LED (Multi State)</name>
+    <x>312</x>
+    <y>288</y>
+    <width>0</width>
+    <height>0</height>
+    <states>
+      <state>
+        <value>0</value>
+        <label>State 1</label>
+        <color>
+          <color name="Off" red="60" green="100" blue="60">
+          </color>
+        </color>
+      </state>
+      <state>
+        <value>1</value>
+        <label>State 2</label>
+        <color>
+          <color name="On" red="0" green="255" blue="0">
+          </color>
+        </color>
+      </state>
+    </states>
+  </widget>
+  <widget type="bool_button" version="2.0.0">
+    <name>Boolean Button_1</name>
+    <pv_name>$(Sys)$(Dev):Reset</pv_name>
+    <x>282</x>
+    <y>10</y>
+    <width>118</width>
+    <height>22</height>
+    <off_label>Reset</off_label>
+    <off_color>
+      <color name="On" red="0" green="255" blue="0">
+      </color>
+    </off_color>
+    <on_label>Resume</on_label>
+    <on_color>
+      <color name="MAJOR" red="255" green="0" blue="0">
+      </color>
+    </on_color>
+    <show_led>false</show_led>
+  </widget>
+</display>
