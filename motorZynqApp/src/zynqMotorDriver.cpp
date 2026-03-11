@@ -109,9 +109,7 @@ asynStatus zynqMotorAxis::move(double position, int relative,
     /* Velocity parameters */
     vBase_ = fabs(minVelocity);
     vMax_  = fabs(maxVelocity);
-    tAccel_ = fabs(acceleration);
-
-    printf("%s: vBase_ = %f, vMax_ = %f\n", __func__, vBase_, vMax_ );
+    tAccel_ = (vMax_ - vBase_) / fabs(acceleration);
 
     if (vBase_ < 1.0) vBase_ = 1.0;        /* minimum 1 step/sec */
     if (vMax_ < vBase_) vMax_ = vBase_;
@@ -310,7 +308,6 @@ void zynqMotorAxis::updateProfile()
 
     case PHASE_CRUISE:
         v = vMax_;
-        printf("%s: Cruise v = %f\n", __func__, v); 
 	
         /* Start deceleration when remaining steps <= decel distance */
         if (remaining <= decelStartRemaining_ && remaining > 0) {
