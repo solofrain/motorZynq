@@ -1,4 +1,0 @@
-NAME=zynqIoc
-PORT=6000
-USER=root
-HOST=pynq
