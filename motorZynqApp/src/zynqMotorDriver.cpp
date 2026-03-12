@@ -239,9 +239,6 @@ asynStatus zynqMotorAxis::poll(bool *moving)
     uint32_t stepRate = pC_->readReg32(axisRegBase_ + REG_STEP_RATE);
     setIntegerParam(pC_->zynqStepRate_, static_cast<epicsInt32>(stepRate));
 
-    uint32_t dirPol = pC_->readRegField(axisRegBase_ + REG_CFG, CFG_DIR_POL_BIT, 1);
-    setIntegerParam(pC_->zynqDirPol_, dirPol);
-
     uint32_t limitEn = pC_->readRegField(axisRegBase_ + REG_CFG, CFG_LIMIT_EN_BIT, 1);
     setIntegerParam(pC_->zynqLimitEn_, limitEn);
 
@@ -368,7 +365,6 @@ zynqMotorController::zynqMotorController(const char *portName, int numAxes,
     , profilerRunning_(true)
 {
     /* Create custom parameters */
-    createParam(ZYNQ_DIR_POL_STRING,    asynParamInt32, &zynqDirPol_);
     createParam(ZYNQ_LIMIT_EN_STRING,   asynParamInt32, &zynqLimitEn_);
     createParam(ZYNQ_LIMIT_POL_STRING,  asynParamInt32, &zynqLimitPol_);
     createParam(ZYNQ_USTEP_MODE_STRING, asynParamInt32, &zynqUstepMode_);
@@ -474,9 +470,7 @@ asynStatus zynqMotorController::writeInt32(asynUser *pasynUser, epicsInt32 value
 
     off_t axBase = pAxis->axisRegBase_;
 
-    if (function == zynqDirPol_) {
-        writeRegField(axBase + REG_CFG, CFG_DIR_POL_BIT, 1, value & 1);
-    } else if (function == zynqLimitEn_) {
+    if (function == zynqLimitEn_) {
         writeRegField(axBase + REG_CFG, CFG_LIMIT_EN_BIT, 1, value & 1);
     } else if (function == zynqLimitPol_) {
         writeRegField(axBase + REG_CFG, CFG_LIMIT_POL_BIT, 1, value & 1);

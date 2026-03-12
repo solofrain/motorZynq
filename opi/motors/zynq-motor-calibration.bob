@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <background_color>
+    <color red="240" green="240" blue="240">
+    </color>
+  </background_color>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="rectangle" version="2.0.0">
+    <name>Rectangle_1</name>
+    <x>313</x>
+    <y>48</y>
+    <width>192</width>
+    <height>79</height>
+    <line_width>1</line_width>
+    <line_color>
+      <color name="Grid" red="128" green="128" blue="128">
+      </color>
+    </line_color>
+    <background_color>
+      <color name="Background" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+  </widget>
+  <widget type="rectangle" version="2.0.0">
+    <name>Rectangle</name>
+    <x>12</x>
+    <y>44</y>
+    <width>292</width>
+    <height>84</height>
+    <line_width>1</line_width>
+    <line_color>
+      <color name="Grid" red="128" green="128" blue="128">
+      </color>
+    </line_color>
+    <background_color>
+      <color name="Background" red="255" green="255" blue="255">
+      </color>
+    </background_color>
+  </widget>
+  <widget type="textentry" version="3.0.0">
+    <name>Text Input_5</name>
+    <pv_name>$(Sys)$(Dev)$(Mtr).OFF</pv_name>
+    <x>270</x>
+    <y>12</y>
+    <width>118</width>
+    <height>22</height>
+    <background_color>
+      <color red="255" green="255" blue="255">
+      </color>
+    </background_color>
+    <actions>
+    </actions>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>OFF Choice</name>
+    <pv_name>$(Sys)$(Dev)$(Mtr).FOFF</pv_name>
+    <x>138</x>
+    <y>12</y>
+    <width>118</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Menu Button</name>
+    <pv_name>$(Sys)$(Dev)$(Mtr).DIR</pv_name>
+    <x>396</x>
+    <y>12</y>
+    <width>110</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Menu Button_1</name>
+    <pv_name>$(Sys)$(Dev)$(Mtr).SET</pv_name>
+    <x>12</x>
+    <y>12</y>
+    <width>118</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_1</name>
+    <text>Limit switch</text>
+    <x>20</x>
+    <y>48</y>
+    <width>78</width>
+    <height>22</height>
+    <font>
+      <font family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Menu Button_3</name>
+    <pv_name>$(Sys)$(Dev):LimitEn</pv_name>
+    <x>20</x>
+    <y>70</y>
+    <width>118</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text Update_1</name>
+    <pv_name>$(Sys)$(Dev):LimitEn_RBV</pv_name>
+    <x>20</x>
+    <y>97</y>
+    <width>118</width>
+    <height>22</height>
+    <format>6</format>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Menu Button_4</name>
+    <pv_name>$(Sys)$(Dev):LimitPol</pv_name>
+    <x>176</x>
+    <y>70</y>
+    <width>118</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text Update_2</name>
+    <pv_name>$(Sys)$(Dev):LimitPol_RBV</pv_name>
+    <x>176</x>
+    <y>97</y>
+    <width>118</width>
+    <height>22</height>
+    <format>6</format>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_2</name>
+    <text>Microstepping</text>
+    <x>325</x>
+    <y>48</y>
+    <width>150</width>
+    <height>22</height>
+    <font>
+      <font family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="combo" version="2.0.0">
+    <name>Menu Button_5</name>
+    <pv_name>$(Sys)$(Dev):UstepMode</pv_name>
+    <x>325</x>
+    <y>70</y>
+    <width>168</width>
+    <height>22</height>
+    <background_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+  </widget>
+  <widget type="textupdate" version="2.0.0">
+    <name>Text Update_3</name>
+    <pv_name>$(Sys)$(Dev):UstepMode_RBV</pv_name>
+    <x>325</x>
+    <y>97</y>
+    <width>168</width>
+    <height>22</height>
+    <format>6</format>
+    <show_units>false</show_units>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+  <widget type="label" version="2.0.0">
+    <name>Label_3</name>
+    <text>Polarity</text>
+    <x>176</x>
+    <y>48</y>
+    <width>78</width>
+    <height>22</height>
+    <vertical_alignment>1</vertical_alignment>
+  </widget>
+</display>

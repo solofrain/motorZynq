@@ -51,14 +51,12 @@ static const off_t REG_STEP_RB   = 0x10;
 static const off_t REG_STATUS    = 0x14;
 
 /* Config register bit fields (cfg, offset 0x00)
- *   [0]    dir_pol     - direction polarity
- *   [1]    limit_en    - limit switch enable
- *   [2]    limit_pol   - limit switch polarity
+ *   [0]    limit_en    - limit switch enable
+ *   [1]    limit_pol   - limit switch polarity
  *   [15:8] ustep_mode  - microstep mode
  */
-static const uint8_t CFG_DIR_POL_BIT    = 0;
-static const uint8_t CFG_LIMIT_EN_BIT   = 1;
-static const uint8_t CFG_LIMIT_POL_BIT  = 2;
+static const uint8_t CFG_LIMIT_EN_BIT   = 0;
+static const uint8_t CFG_LIMIT_POL_BIT  = 1;
 static const uint8_t CFG_USTEP_MODE_BIT = 8;
 static const uint8_t CFG_USTEP_MODE_WID = 8;
 
@@ -189,7 +187,6 @@ public:
 
 protected:
     /* Custom asyn parameter indices */
-    int zynqDirPol_;
     int zynqLimitEn_;
     int zynqLimitPol_;
     int zynqUstepMode_;
@@ -197,7 +194,7 @@ protected:
     int zynqReset_;
     int zynqStepRate_;
 
-#define FIRST_ZYNQ_PARAM zynqDirPol_
+#define FIRST_ZYNQ_PARAM zynqLimitEn_
 #define LAST_ZYNQ_PARAM  zynqStepRate_
 #define NUM_ZYNQ_PARAMS  (LAST_ZYNQ_PARAM - FIRST_ZYNQ_PARAM + 1)
 

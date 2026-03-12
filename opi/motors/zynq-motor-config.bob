@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display version="2.0.0">
+  <name>Motor Config</name>
+  <width>525</width>
+  <height>1200</height>
+  <actions>
+  </actions>
+  <grid_step_x>6</grid_step_x>
+  <grid_step_y>6</grid_step_y>
+  <widget type="label" version="2.0.0">
+    <name>Label</name>
+    <text>$(Sys)$(Dev)$(Mtr)</text>
+    <width>525</width>
+    <height>30</height>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <background_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </background_color>
+    <transparent>false</transparent>
+    <horizontal_alignment>1</horizontal_alignment>
+    <vertical_alignment>1</vertical_alignment>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>PMAC Status</name>
+    <x>9</x>
+    <y>1156</y>
+    <width>253</width>
+    <height>78</height>
+    <style>1</style>
+    <foreground_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color red="240" green="240" blue="240">
+      </color>
+    </line_color>
+    <actions>
+    </actions>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button</name>
+      <actions>
+        <action type="open_display">
+          <description>Open Display</description>
+          <file>pmacStatus.opi</file>
+          <macros>
+            <SYS>$(CntlSys)</SYS>
+            <DEV>$(CntlDev)</DEV>
+          </macros>
+          <target>window</target>
+        </action>
+      </actions>
+      <text>Cntl. Status</text>
+      <x>6</x>
+      <y>12</y>
+      <width>109</width>
+      <height>31</height>
+      <tooltip>$(actions)</tooltip>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+    <widget type="action_button" version="3.0.0">
+      <name>Action Button</name>
+      <actions>
+        <action type="open_display">
+          <description>Open Display</description>
+          <file>pmacStatusAxis.opi</file>
+          <macros>
+            <SYS>$(CntlSys)</SYS>
+            <DEV>$(CntlDev)</DEV>
+            <AXIS>$(CntlAxis)</AXIS>
+          </macros>
+          <target>window</target>
+        </action>
+      </actions>
+      <text>Axis Status</text>
+      <x>132</x>
+      <y>12</y>
+      <width>109</width>
+      <height>31</height>
+      <tooltip>$(actions)</tooltip>
+      <border_alarm_sensitive>false</border_alarm_sensitive>
+    </widget>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Drive</name>
+    <x>6</x>
+    <y>194</y>
+    <width>511</width>
+    <height>265</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Calibration</name>
+    <x>7</x>
+    <y>464</y>
+    <width>511</width>
+    <height>157</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Dynamics</name>
+    <x>8</x>
+    <y>627</y>
+    <width>511</width>
+    <height>241</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+    <widget type="embedded" version="2.0.0">
+      <name>Dynamics_Content</name>
+      <file>zynq-motor-dynamics.opi</file>
+      <width>509</width>
+      <height>221</height>
+      <transparent>true</transparent>
+      <actions>
+      </actions>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Status</name>
+    <x>6</x>
+    <y>36</y>
+    <width>511</width>
+    <height>79</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+    <widget type="embedded" version="2.0.0">
+      <name>Status_Content</name>
+      <file>zynq-motor-status.opi</file>
+      <width>509</width>
+      <height>59</height>
+      <transparent>true</transparent>
+      <actions>
+      </actions>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Resolution</name>
+    <x>8</x>
+    <y>874</y>
+    <width>254</width>
+    <height>277</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+    <widget type="embedded" version="2.0.0">
+      <name>Resolution_Content</name>
+      <file>zynq-motor-resolution.opi</file>
+      <width>252</width>
+      <height>257</height>
+      <transparent>true</transparent>
+      <actions>
+      </actions>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>System Status</name>
+    <x>266</x>
+    <y>874</y>
+    <width>254</width>
+    <height>360</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+    <widget type="embedded" version="2.0.0">
+      <name>System Status_Content</name>
+      <file>zynq-motor-system-status.opi</file>
+      <width>252</width>
+      <height>340</height>
+      <transparent>true</transparent>
+      <actions>
+      </actions>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Drive_Content</name>
+    <file>zynq-motor-drive.opi</file>
+    <x>7</x>
+    <y>213</y>
+    <width>509</width>
+    <height>245</height>
+    <transparent>true</transparent>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+  <widget type="group" version="3.0.0">
+    <name>Control</name>
+    <x>6</x>
+    <y>120</y>
+    <width>511</width>
+    <height>69</height>
+    <style>1</style>
+    <font>
+      <font name="Default Bold" family="Liberation Sans" style="BOLD" size="14.0">
+      </font>
+    </font>
+    <foreground_color>
+      <color name="White" red="255" green="255" blue="255">
+      </color>
+    </foreground_color>
+    <line_color>
+      <color name="Title bar" red="0" green="127" blue="255">
+      </color>
+    </line_color>
+    <widget type="embedded" version="2.0.0">
+      <name>Status_Content_1</name>
+      <file>zynq-motor-control.opi</file>
+      <y>1</y>
+      <width>509</width>
+      <height>48</height>
+      <transparent>true</transparent>
+      <actions>
+      </actions>
+      <border_color>
+        <color red="0" green="128" blue="255">
+        </color>
+      </border_color>
+    </widget>
+  </widget>
+  <widget type="polyline" version="2.0.0">
+    <name>Polyline</name>
+    <x>594</x>
+    <y>192</y>
+    <width>6</width>
+    <height>1</height>
+  </widget>
+  <widget type="embedded" version="2.0.0">
+    <name>Calibration_Content</name>
+    <file>zynq-motor-calibration.opi</file>
+    <x>8</x>
+    <y>483</y>
+    <width>509</width>
+    <height>138</height>
+    <transparent>true</transparent>
+    <actions>
+    </actions>
+    <border_color>
+      <color red="0" green="128" blue="255">
+      </color>
+    </border_color>
+  </widget>
+</display>
