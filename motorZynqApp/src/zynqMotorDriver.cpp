@@ -38,6 +38,8 @@ zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
     : asynMotorAxis(pC, axisNo)
     , pC_(pC)
     , axisRegBase_(MOTOR_REG_OFFSET + axisNo * MOTOR_REG_STRIDE)
+    , moveState_(MOVE_IDLE)
+    , moveRequested_(false)
     , softPosition_(0.0)
     , moveStartPos_(0.0)
     , totalMoveSteps_(0)
@@ -128,9 +130,14 @@ asynStatus zynqMotorAxis::move(double position, int relative,
          *        v_peak = totalSteps / t_accel - v_base
          * But also ensure v_peak >= v_base */
         double vPeak = static_cast<double>(totalMoveSteps_) / tAccel_ - vBase_;
-        if (vPeak < vBase_) vPeak = vBase_;
-        vMax_ = vPeak;
-        dAccel = (vBase_ + vMax_) / 2.0 * tAccel_;
+        if (vPeak <= vBase_) {
+            /* Move too short for any acceleration — run at constant vBase_ */
+            vMax_ = vBase_;
+            dAccel = 0.0;
+        } else {
+            vMax_ = vPeak;
+            dAccel = (vBase_ + vMax_) / 2.0 * tAccel_;
+        }
     }
 
     dAccelSteps_ = static_cast<uint32_t>(dAccel + 0.5);
@@ -162,9 +169,12 @@ asynStatus zynqMotorAxis::move(double position, int relative,
     ctrl = (ctrl & ~(1U << CTRL_DIR_BIT)) | (hwDir << CTRL_DIR_BIT);
     pC_->writeReg32(axisRegBase_ + REG_CONTROL, ctrl);
 
-    /* Activate profiler */
-    profilePhase_ = PHASE_ACCEL;
+    /* Activate profiler — skip accel phase for constant-velocity moves */
+    profilePhase_ = (vMax_ > vBase_) ? PHASE_ACCEL : PHASE_CRUISE;
     profileActive_ = true;
+
+    /* Signal poll() to enter MOVE_ACTIVE state */
+    moveRequested_ = true;
 
     return asynSuccess;
 }
@@ -188,6 +198,10 @@ asynStatus zynqMotorAxis::stop(double acceleration)
     uint32_t completed = (totalMoveSteps_ > remaining) ? (totalMoveSteps_ - remaining) : 0;
     softPosition_ = moveStartPos_ + moveDirection_ * static_cast<double>(completed);
 
+    /* Go directly to IDLE (not DONE) since we don't want to snap to target */
+    moveRequested_ = false;
+    moveState_ = MOVE_IDLE;
+
     return asynSuccess;
 }
 
@@ -205,19 +219,38 @@ asynStatus zynqMotorAxis::poll(bool *moving)
 
     *moving = (isMoving != 0);
 
-    /* Update position from step_rb (remaining steps) */
-    if (*moving || profileActive_) {
+    /* Move lifecycle FSM (poll() is the sole owner of moveState_) */
+    switch (moveState_) {
+
+    case MOVE_IDLE:
+        if (moveRequested_) {
+            moveRequested_ = false;
+            moveState_ = MOVE_ACTIVE;
+        }
+        break;
+
+    case MOVE_ACTIVE: {
+        /* Track position from step_rb while move is in progress */
         uint32_t remaining = pC_->readReg32(axisRegBase_ + REG_STEP_RB);
-        uint32_t completed = (totalMoveSteps_ > remaining) ? (totalMoveSteps_ - remaining) : 0;
-        softPosition_ = moveStartPos_ + moveDirection_ * static_cast<double>(completed);
+        uint32_t completed = (totalMoveSteps_ > remaining)
+                           ? (totalMoveSteps_ - remaining) : 0;
+        softPosition_ = moveStartPos_
+                      + moveDirection_ * static_cast<double>(completed);
+
+        if (!isMoving)
+            moveState_ = MOVE_DONE;
+        break;
     }
 
-    /* If hardware says done but profiler was still active, finalize */
-    if (!(*moving) && profileActive_) {
+    case MOVE_DONE:
+        /* Finalize: snap position to exact target */
         profileActive_ = false;
         profilePhase_ = PHASE_IDLE;
-	pC_->writeRegField( axisRegBase_ + REG_CONTROL, CTRL_EN_BIT, 1, 0 );
-        softPosition_ = moveStartPos_ + moveDirection_ * static_cast<double>(totalMoveSteps_);
+        softPosition_ = moveStartPos_
+                      + moveDirection_ * static_cast<double>(totalMoveSteps_);
+        pC_->writeRegField(axisRegBase_ + REG_CONTROL, CTRL_EN_BIT, 1, 0);
+        moveState_ = MOVE_IDLE;
+        break;
     }
 
     /* Read power-on (enable) state */

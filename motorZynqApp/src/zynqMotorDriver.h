@@ -132,6 +132,11 @@ private:
     /* Per-axis register base offset (MOTOR_REG_OFFSET + axisNo * MOTOR_REG_STRIDE) */
     off_t axisRegBase_;
 
+    /* Move lifecycle FSM (owned exclusively by poll()) */
+    enum MoveState { MOVE_IDLE, MOVE_ACTIVE, MOVE_DONE };
+    MoveState moveState_;
+    bool     moveRequested_;     /* set by move(), consumed by poll() */
+
     /* Software position tracking */
     double   softPosition_;      /* current absolute position in steps */
     double   moveStartPos_;      /* position at start of current move */
