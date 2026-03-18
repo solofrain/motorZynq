@@ -152,3 +152,17 @@ record(longin, "$(P)$(M):StepRate_RBV") {
     field(INP,  "@asyn($(PORT),$(ADDR))ZYNQ_STEP_RATE")
     field(SCAN, "I/O Intr")
 }
+
+# -- Auto MRES Calculation --
+# Computes MRES = UREV / (SREV * microsteps_per_step)
+# where microsteps_per_step = 2^(UstepMode & 0xF)
+record(calcout, "$(P)$(M):CalcMRES") {
+    field(DESC, "Auto-calculate MRES")
+    field(INPA, "$(P)$(M).UREV CP")
+    field(INPB, "$(P)$(M).SREV CP")
+    field(INPC, "$(P)$(M):UstepMode_RBV CP")
+    field(CALC, "A/(B*2^(FLOOR(C)&15))")
+    field(OUT,  "$(P)$(M).MRES PP")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+}
