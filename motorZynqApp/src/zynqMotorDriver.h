@@ -26,6 +26,7 @@
 #include <epicsMutex.h>
 
 #include "zynq_reg.h"
+#include "zynqMotorRegs_gen.hpp"
 
 /* ------------------------------------------------------------------ */
 /* Hardware constants                                                  */
@@ -38,53 +39,9 @@ static const uint64_t COUNTER_MAX         = (1ULL << COUNTER_BITS);
 static const uint32_t MAX_STEP_RATE       =
     static_cast<uint32_t>((static_cast<uint64_t>(MAX_STEP_FREQ_HZ) * COUNTER_MAX) / FPGA_CLOCK_HZ);
 
-static const off_t  MOTOR_REG_OFFSET = 0x100;
-static const off_t  MOTOR_REG_STRIDE = 0x30;
-static const size_t REG_SIZE         = 0x1000;
-
-/* Per-axis register offsets (relative to axis base) */
-static const off_t REG_CFG       = 0x00;
-static const off_t REG_STEP_RATE = 0x04;
-static const off_t REG_CONTROL   = 0x08;
-static const off_t REG_STEP_SP   = 0x0C;
-static const off_t REG_STEP_RB   = 0x10;
-static const off_t REG_STATUS    = 0x14;
-
-/* Config register bit fields (cfg, offset 0x00)
- *   [0]    limit_en    - limit switch enable
- *   [1]    limit_pol   - limit switch polarity
- *   [15:8] ustep_mode  - microstep mode
+/* Register offsets and bit fields are generated from firmware sources.
+ * See firmware/src/scripts/gen_zynq_motor_regs.py.
  */
-static const uint8_t CFG_LIMIT_EN_BIT   = 0;
-static const uint8_t CFG_LIMIT_POL_BIT  = 1;
-static const uint8_t CFG_USTEP_MODE_BIT = 8;
-static const uint8_t CFG_USTEP_MODE_WID = 8;
-
-/* Control register bit fields (control, offset 0x08)
- *   [0] en     - enable (active high; hardware inverts to enbn)
- *   [1] reset  - reset  (active high; hardware inverts to resetn)
- *   [2] sleep  - sleep  (active high; hardware inverts to sleepn)
- *   [3] dir    - direction
- *   [4] mstart - start (one-shot)
- *   [5] mstop  - stop  (one-shot)
- */
-static const uint8_t CTRL_EN_BIT     = 0;
-static const uint8_t CTRL_RESET_BIT  = 1;
-static const uint8_t CTRL_SLEEP_BIT  = 2;
-static const uint8_t CTRL_DIR_BIT    = 3;
-static const uint8_t CTRL_MSTART_BIT = 4;
-static const uint8_t CTRL_MSTOP_BIT  = 5;
-
-/* Status register bit fields (status, offset 0x14)
- *   [0] fault   - inverted from faultn
- *   [1] moving
- *   [2] p_limit - positive limit
- *   [3] n_limit - negative limit
- */
-static const uint8_t STAT_FAULT_BIT   = 0;
-static const uint8_t STAT_MOVING_BIT  = 1;
-static const uint8_t STAT_PLIMIT_BIT  = 2;
-static const uint8_t STAT_NLIMIT_BIT  = 3;
 
 /* S-curve profiler update interval */
 static const double PROFILE_UPDATE_SEC = 0.0001;  /* 0.1 ms */

@@ -5,10 +5,12 @@
  * using TI DRV8434A step-direction drivers.
  *
  * Key design:
- *   - step_rb is REMAINING steps (counts down to 0), not absolute position.
- *   - Absolute position tracked in software (softPosition_).
+ *   - MRES is automatically calculated from ustep_mode (auto-MRES). The motor record
+ *     therefore commands in microstep units; no scaling in the driver is needed.
+ *   - step_rb is REMAINING microstep pulses (counts down to 0 — same units as motor steps).
+ *   - Realtime absolute position read back from 64-bit pos_rb_lo/hi hardware registers.
+ *   - setPosition() writes pos_sp_lo/hi and pulses pos_set to update FPGA position.
  *   - S-curve motion profiling via raised-cosine velocity updates every 5 ms.
- *   - step_rate can be updated on-the-fly during motion (DDS is combinational).
  */
 
 #include "zynqMotorDriver.h"
@@ -17,6 +19,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <stdexcept>
+#include <cstdio>
 
 #include <iocsh.h>
 #include <epicsExport.h>
@@ -30,9 +33,89 @@
 
 static const char *driverName = "zynqMotorDriver";
 
+namespace {
+
+/*
+ * Firmware register encoding:
+ *   DEVICE  register [0x00]: [31:16] = device type, [15:0] = subdevice type
+ *   VERSION register [0x04]: [31:24] = major,       [23:16] = minor, [15:0] = build
+ *
+ * Firmware device/subdevice codes (from generic_pkg.sv):
+ *   device:    0x0006 = MOTION_KRIA
+ *   subdevice: 0x0000 = SUBMOTION_KR260_DRV8434A_4CH
+ *              0x0001 = SUBMOTION_KR260_DRV8825_4CH
+ *              0x0002 = SUBMOTION_KRIA_DRV8434A_8CH
+ *              0x0003 = SUBMOTION_KRIA_DRV8825_8CH
+ *
+ * ABI policy:
+ *   - major: incremented on breaking register map or semantic changes.
+ *            This software must be updated when major changes.
+ *   - minor: incremented on backward-compatible additions (new registers/bits).
+ *            Software accepts any minor >= minMinor for a given major.
+ *   - build: not part of the ABI contract; ignored here.
+ *
+ * How to update this table:
+ *   - When firmware increments major: add a new row (or update existing).
+ *   - When firmware increments minor in a backward-compatible way: raise maxMinor.
+ *   - Never lower minMinor of an existing row unless you are sure older builds work.
+ */
+struct FwCompatRule {
+    uint32_t device;    /* DEVICE register: must match exactly */
+    uint8_t  major;     /* VERSION[31:24]: must match exactly  */
+    uint8_t  minMinor;  /* VERSION[23:16]: accepted range low  */
+    uint8_t  maxMinor;  /* VERSION[23:16]: accepted range high */
+    const char *name;
+};
+
+/* ------------------------------------------------------------------ */
+/* Compatibility table — update this when firmware ABI changes        */
+/* ------------------------------------------------------------------ */
+static const FwCompatRule kFwCompatRules[] = {
+/*  device               major  minMinor  maxMinor  description                         */
+    { 0x00060000u,           1,      0,       255,    "MOTION_KRIA / KR260 DRV8434A 4CH" },
+};
+/* ------------------------------------------------------------------ */
+
+bool isFirmwareCompatible(uint32_t device, uint32_t version)
+{
+    uint8_t major =   static_cast<uint8_t>((version >> 24) & 0xFFu);
+    uint8_t minor =   static_cast<uint8_t>((version >> 16) & 0xFFu);
+
+    for (const auto &rule : kFwCompatRules) {
+        if (device   == rule.device
+         && major    == rule.major
+         && minor    >= rule.minMinor
+         && minor    <= rule.maxMinor)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+} // namespace
+
 /* ================================================================== */
 /*  zynqMotorAxis                                                      */
 /* ================================================================== */
+
+/* Read signed 64-bit realtime position from two 32-bit registers */
+static int64_t readReg64Signed(zynqMotorController *pC, off_t loOffset)
+{
+    uint32_t lo = pC->readReg32(loOffset);
+    uint32_t hi = pC->readReg32(loOffset + 4);
+    uint64_t u = (static_cast<uint64_t>(hi) << 32) | lo;
+    return static_cast<int64_t>(u);
+}
+
+/* Write signed 64-bit value into two 32-bit registers */
+static void writeReg64(zynqMotorController *pC, off_t loOffset, int64_t val)
+{
+    uint32_t lo = static_cast<uint32_t>(val & 0xFFFF'FFFFu);
+    uint32_t hi = static_cast<uint32_t>((static_cast<uint64_t>(val) >> 32) & 0xFFFF'FFFFu);
+    pC->writeReg32(loOffset, lo);
+    pC->writeReg32(loOffset + 4, hi);
+}
 
 zynqMotorAxis::zynqMotorAxis(zynqMotorController *pC, int axisNo)
     : asynMotorAxis(pC, axisNo)
@@ -152,7 +235,7 @@ asynStatus zynqMotorAxis::move(double position, int relative,
     uint32_t hwDir = (moveDirection_ > 0) ? 0 : 1;
     pC_->writeRegField(axisRegBase_ + REG_CONTROL, CTRL_DIR_BIT, 1, hwDir);
 
-    /* Set step count */
+    /* Set step count (motor record already works in microstep units via auto-MRES) */
     pC_->writeReg32(axisRegBase_ + REG_STEP_SP, totalMoveSteps_);
 
     /* Set initial velocity (base speed) */
@@ -230,13 +313,7 @@ asynStatus zynqMotorAxis::poll(bool *moving)
         break;
 
     case MOVE_ACTIVE: {
-        /* Track position from step_rb while move is in progress */
-        uint32_t remaining = pC_->readReg32(axisRegBase_ + REG_STEP_RB);
-        uint32_t completed = (totalMoveSteps_ > remaining)
-                           ? (totalMoveSteps_ - remaining) : 0;
-        softPosition_ = moveStartPos_
-                      + moveDirection_ * static_cast<double>(completed);
-
+        /* Position is updated from realtime pos_rb below. */
         if (!isMoving)
             moveState_ = MOVE_DONE;
         break;
@@ -265,9 +342,6 @@ asynStatus zynqMotorAxis::poll(bool *moving)
     setIntegerParam(pC_->motorStatusPowerOn_, powerOn);
     setIntegerParam(pC_->motorStatusDirection_, (moveDirection_ > 0) ? 1 : 0);
 
-    setDoubleParam(pC_->motorPosition_, softPosition_);
-    setDoubleParam(pC_->motorEncoderPosition_, softPosition_);
-
     /* Update custom readback parameters */
     uint32_t stepRate = pC_->readReg32(axisRegBase_ + REG_STEP_RATE);
     setIntegerParam(pC_->zynqStepRate_, static_cast<epicsInt32>(stepRate));
@@ -282,6 +356,15 @@ asynStatus zynqMotorAxis::poll(bool *moving)
                                            CFG_USTEP_MODE_BIT, CFG_USTEP_MODE_WID);
     setIntegerParam(pC_->zynqUstepMode_, ustepMode);
 
+    /* Read realtime position from hardware (64-bit, in microstep units = motor step units) */
+    {
+        int64_t rt_pos = readReg64Signed(pC_, axisRegBase_ + REG_POS_RB_LO);
+        double pos_steps = static_cast<double>(rt_pos);
+        setDoubleParam(pC_->motorPosition_, pos_steps);
+        setDoubleParam(pC_->motorEncoderPosition_, pos_steps);
+        softPosition_ = pos_steps;
+    }
+
     uint32_t sleepBit = pC_->readRegField(axisRegBase_ + REG_CONTROL, CTRL_SLEEP_BIT, 1);
     setIntegerParam(pC_->zynqSleep_, sleepBit);
 
@@ -293,7 +376,17 @@ asynStatus zynqMotorAxis::poll(bool *moving)
 
 asynStatus zynqMotorAxis::setPosition(double position)
 {
-    /* Hardware has no writable position register; track in software only */
+    /* Write realtime position into FPGA registers and trigger pos_set.
+     * Position is already in microstep units (motor record uses auto-MRES). */
+    int64_t hwPos = static_cast<int64_t>(std::llround(position));
+
+    /* Write 64-bit position */
+    writeReg64(pC_, axisRegBase_ + REG_POS_SP_LO, hwPos);
+
+    /* Pulse pos_set bit in control register */
+    pC_->writeRegField(axisRegBase_ + REG_CONTROL, CTRL_POS_SET_BIT, 1, 1);
+
+    /* Update software position to match hardware */
     softPosition_ = position;
     return asynSuccess;
 }
@@ -407,6 +500,33 @@ zynqMotorController::zynqMotorController(const char *portName, int numAxes,
 
     /* Open mmap register access */
     reg_ = std::make_unique<zynqReg>(static_cast<off_t>(baseAddr), REG_SIZE);
+
+    /* Check firmware compatibility (DEVICE/VERSION at 0x0/0x4) */
+    uint32_t fwDevice  = readReg32(REG_DEVICE);
+    uint32_t fwVersion = readReg32(REG_VERSION);
+    uint32_t fwGitHash = readReg32(REG_GIT_HASH);
+    bool     fwDirty   = (fwGitHash >> 31) & 1u;
+
+    std::printf("%s: DEVICE=0x%08X  VERSION=%u.%u.%u  GIT=%07X%s\n",
+                driverName,
+                fwDevice,
+                (fwVersion >> 24) & 0xFFu,
+                (fwVersion >> 16) & 0xFFu,
+                fwVersion & 0xFFFFu,
+                fwGitHash & 0x0FFFFFFFu,
+                fwDirty ? "-dirty" : "");
+
+    if (!isFirmwareCompatible(fwDevice, fwVersion)) {
+        char msg[256];
+        std::snprintf(msg, sizeof(msg),
+                      "%s: incompatible firmware (DEVICE=0x%08X VERSION=%u.%u.%u)",
+                      driverName,
+                      fwDevice,
+                      (fwVersion >> 24) & 0xFFu,
+                      (fwVersion >> 16) & 0xFFu,
+                      fwVersion & 0xFFFFu);
+        throw std::runtime_error(msg);
+    }
 
     /* Create axes */
     for (int axis = 0; axis < numAxes; axis++) {
